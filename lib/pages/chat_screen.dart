@@ -7,6 +7,7 @@ import 'package:file_picker/file_picker.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
 import 'package:intl/intl.dart';
+import 'package:syncfusion_flutter_pdfviewer/pdfviewer.dart';
 // import 'package:doc_app/chat/message_model.dart';
 // import 'package:doc_app/chat/user_model.dart';
 
@@ -25,7 +26,7 @@ class _ChatScreenState extends State<ChatScreen> {
   Storage storage = Storage();
   TextEditingController texFieldController = TextEditingController();
 
-Future _showImg(String _url) async {
+Future _showAttachment(String _url, bool isImg) async {
       return await showGeneralDialog(
               context: context,
               barrierDismissible: true,
@@ -35,7 +36,8 @@ Future _showImg(String _url) async {
               transitionDuration: const Duration(milliseconds: 200),
               pageBuilder: (BuildContext buildContext, Animation animation,
                   Animation secondaryAnimation) {
-               
+                
+              if(isImg == true){
                 return SafeArea(
                   child: Material(
                     child: Container(
@@ -55,6 +57,24 @@ Future _showImg(String _url) async {
                     ),
                   ),
                 );
+              }else{
+                return SafeArea(
+                  child:  Material(
+                    child: Stack(
+                      children: [
+                        SfPdfViewer.network(_url),
+                        Align(
+                          alignment: Alignment.topLeft,
+                          child: IconButton(
+                            onPressed: (() => Navigator.pop(context)), 
+                            icon: const Icon(Icons.arrow_back_ios, color: Colors.black,),
+                          ),
+                        ),
+                      ],
+                    ),
+                  ),
+                );
+              }
     });
   }
 
@@ -117,17 +137,17 @@ Future _showImg(String _url) async {
                               image: DecorationImage(image: NetworkImage(_data), fit: BoxFit.cover),
                             ),
                             child: TextButton(
-                              onPressed: (() => _showImg(_data)),
+                              onPressed: (() => _showAttachment(_data, true)),
                               child: const SizedBox(),
                             ),
                           )
                           : isImg == false && isDoc == true ?
-                          const SizedBox(
+                            SizedBox(
                               height: 90,
                               width: 90,
                               child: IconButton(
-                              onPressed: null, 
-                              icon: Icon(Icons.picture_as_pdf, color: Colors.black, size: 90,),
+                              onPressed: (() => _showAttachment(_data, false)), 
+                              icon: const Icon(Icons.picture_as_pdf, color: Colors.black, size: 90,),
                             ),
                           ) : const SizedBox(),
                         const SizedBox(height: 2.5,)
@@ -220,7 +240,94 @@ Future _showImg(String _url) async {
         children: <Widget>[
           Container(
             alignment: Alignment.topLeft,
-            child: Container(
+            child: 
+              isImg == true || isDoc  == true ?
+            FutureBuilder(
+                future: attachment,
+                builder: (BuildContext context,
+                    AsyncSnapshot snapshot) {
+                  if (snapshot.hasError) {
+                    return const SizedBox(
+                      height: 90,
+                      width: 90,
+                      child:
+                      Center(child:  Text(
+                        "Ошибка загрузки..",
+                        style: TextStyle(
+                          fontSize: 20,
+                          fontWeight: FontWeight.bold,
+                        ),
+                        textAlign: TextAlign.center,
+                        ),
+                      ),
+                    );
+                  }
+
+                  if (snapshot.connectionState == ConnectionState.waiting) {
+                    return const SizedBox(
+                      height: 90,
+                      width: 90,
+                      child:
+                      Center(child:  Text(
+                        "Загрузка данных..",
+                        style: TextStyle(
+                          fontSize: 20,
+                          fontWeight: FontWeight.bold,
+                        ),
+                        textAlign: TextAlign.center,
+                        ),
+                      ),
+                    );
+                  }
+                  if (snapshot.hasData){
+                    var _data = snapshot.data;
+                    return Column(
+                      children: [
+                        const SizedBox(height: 2.5,),
+                        isImg == true && isDoc == false ?
+                          Container(
+                            height: 90,
+                            width: 90,
+                            decoration: BoxDecoration(
+                              color: Colors.transparent,
+                              image: DecorationImage(image: NetworkImage(_data), fit: BoxFit.cover),
+                            ),
+                            child: TextButton(
+                              onPressed: (() => _showAttachment(_data, true)),
+                              child: const SizedBox(),
+                            ),
+                          )
+                          : isImg == false && isDoc == true ?
+                            SizedBox(
+                              height: 90,
+                              width: 90,
+                              child: IconButton(
+                              onPressed: (() => _showAttachment(_data, false)), 
+                              icon: const Icon(Icons.picture_as_pdf, color: Colors.black, size: 90,),
+                            ),
+                          ) : const SizedBox(),
+                        const SizedBox(height: 2.5,)
+                      ],
+                    );
+                  }else{
+                    return const SizedBox(
+                      height: 90,
+                      width: 90,
+                      child:
+                      Center(child:  Text(
+                        "Ошибка загрузки..",
+                        style: TextStyle(
+                          fontSize: 20,
+                          fontWeight: FontWeight.bold,
+                        ),
+                        textAlign: TextAlign.center,
+                        ),
+                      ),
+                    );
+                  }
+                }
+              )
+            : Container(
               constraints: BoxConstraints(
                 maxWidth: MediaQuery.of(context).size.width * 0.80,
               ),
