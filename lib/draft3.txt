@@ -1,0 +1,19 @@
+data['is_subcat'] == null && data['is_nestedcat'] != null && data['is_nestedcat'] == true
+? _initCategories('categories/' + data['id_category'].toString() + '/doctors')
+: data['is_subcat'] != null && data['is_nestedcat'] == null ? _initCategories('doctors/' + data['id_category'].toString() + '/' + data['id_category'].toString())
+: (data['is_nestedcat'] != null && data['is_nestedcat'] == true) || (data['is_nestedcat'] == null)
+? Navigator.push(
+    context,
+    MaterialPageRoute(builder: (context) => DocPage('doctors/' + data['id_category'].toString() + '/' + data['id_category'].toString(), data['id_doctor'])),
+)
+: data['is_nestedcat'] != null && data['is_nestedcat'] == false && data['id_category'].toInt() == 2
+?
+Navigator.push(
+    context,
+    MaterialPageRoute(builder: (context) => const ChatsPage()),
+)
+    : data['is_nestedcat'] != null && data['is_nestedcat'] == false && data['id_category'].toInt() == 3
+? Navigator.push(
+    context,
+    MaterialPageRoute(builder: (context) => const TestPage()),
+) : null,

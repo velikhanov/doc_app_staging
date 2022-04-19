@@ -1,0 +1,103 @@
+
+               StreamBuilder<QuerySnapshot>(
+                stream: _category,
+                builder: (BuildContext context, AsyncSnapshot<QuerySnapshot> snapshot) {
+                  if(snapshot.hasError) {
+                    return Column(
+                      mainAxisAlignment: MainAxisAlignment.center,
+                      children: <Widget>[
+                        Flexible(
+                          child: Text(
+                            "Ошибка загрузки данных.\nПожалуйста, повторите попытку позже: ${snapshot.error.toString()}", 
+                            style: const TextStyle(fontSize: 20, fontWeight: FontWeight.bold,),
+                            textAlign: TextAlign.center,
+                          ),
+                        ),
+                      ],
+                    );
+                  }
+   
+                  if(snapshot.connectionState == ConnectionState.waiting) {
+                    return Column(
+                      mainAxisAlignment: MainAxisAlignment.center,
+                      children: const <Widget>[
+                        Flexible(
+                          child: Text(
+                            "Загрузка данных, пожалуйста, подождите..", 
+                            style: TextStyle(fontSize: 20, fontWeight: FontWeight.bold,),
+                            textAlign: TextAlign.center,
+                          ),
+                        ),
+                      ],
+                    );
+                  }
+
+                  if(snapshot.hasData){
+                    return SingleChildScrollView(
+                      child: Column(
+                        mainAxisAlignment: MainAxisAlignment.spaceAround,
+                        crossAxisAlignment: CrossAxisAlignment.center,
+                        children: snapshot.data!.docs.map((DocumentSnapshot document) {
+                        Map<String, dynamic> data = document.data()! as Map<String, dynamic>;
+                        inspect(_data);
+                          return GestureDetector(
+                            onTap: () {
+                              Navigator.push(
+                                context,
+                                MaterialPageRoute(builder: (context) => const TestPage()),
+                              );
+                            },
+                            child: Card(
+                              margin: const EdgeInsets.all(12),
+                              elevation: 4,
+                              color: const Color.fromRGBO(64, 75, 96, .9),
+                              child: Padding(
+                                padding: const EdgeInsets.symmetric(vertical: 8.0, horizontal: 16),
+                                child: Row(
+                                  children: <Widget>[
+                                    Column(
+                                      crossAxisAlignment: CrossAxisAlignment.start,
+                                      mainAxisSize: MainAxisSize.min,
+                                      children: <Widget>[
+                                        Text(data['category'], style: const TextStyle(fontSize: 20, fontWeight: FontWeight.bold)),
+                                        const SizedBox(height: 4),
+                                        // Text(data['first_name']! + ' ' + data['second_name']!, style: const TextStyle(color: Colors.white70)),
+                                        // Text(data['category'], style: const TextStyle(color: Colors.white70)),
+                                      ],
+                                    ),
+                                    const Spacer(),
+                                    const CircleAvatar(
+                                      // backgroundColor: Colors.white,
+                                      // ignore: todo
+                                      // TODO: to check if image file exists to avoid problem with image loading when image name is incorrect in DB
+                                      // backgroundImage: data['img'] != "" && data['img'] != null
+                                      // ? AssetImage('assets/images/' + data['img'])
+                                      // : const AssetImage('assets/images/home_img.png')
+                                    ),
+                                  ],
+                                ),
+                              ),
+                            ),
+                          );
+                        }).toList(),
+                      ),
+                    );
+                  }else{
+                    return Expanded(
+                    child:
+                      Column(
+                        mainAxisAlignment: MainAxisAlignment.center,
+                        children: const <Widget>[
+                          Flexible(
+                            child: Text(
+                              "Ошибка загрузки данных.\nПожалуйста, повторите попытку позже", 
+                              style: TextStyle(fontSize: 20, fontWeight: FontWeight.bold,),
+                              textAlign: TextAlign.center,
+                            ),
+                          ),
+                        ],
+                      ),
+                    );
+                  }
+                },
+              ),
