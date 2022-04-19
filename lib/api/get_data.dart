@@ -185,3 +185,60 @@ getChats(String _collection, String uid) async {
     }
   }
 }
+
+// Return related documentation that was used by doctors or patients
+getDocuments(String uid, bool isFirstPage, {String? email}) async{
+  QuerySnapshot<Map<String, dynamic>> _userRole = await FirebaseFirestore
+      .instance
+      .collection('roles')
+      .where('uid', isEqualTo: FirebaseAuth.instance.currentUser!.uid)
+      .get();
+
+  for (QueryDocumentSnapshot<Map<String, dynamic>> element in _userRole.docs) {
+    if (element.data()['role'] == 'p') {
+      List _result = [];
+      QuerySnapshot<Map<String, dynamic>> _getMemberUid =
+          await FirebaseFirestore.instance
+              .collection('all_chats')
+              .where('member_1', isEqualTo: uid)
+              .get();
+      for (QueryDocumentSnapshot<Map<String, dynamic>> el
+          in _getMemberUid.docs) {
+        QuerySnapshot<Map<String, dynamic>> _snapshot = await FirebaseFirestore
+            .instance
+            .collection('chats/' + uid + '/' + el.data()['member_2'])
+            .where('attachment', isNotEqualTo: "")
+            .orderBy('attachment', descending: false)
+            .get();
+            if(isFirstPage == true){
+              _result.add(_snapshot.docs[0].data()['member_2_email']);
+            }else{
+              for (var _res in _snapshot.docs) {
+                if(_res.data()['member_2_email'] == email){
+                  _result.add(_res);
+                }
+              }
+            }
+        }
+        return _result;
+
+    } else if (element.data()['role'] == 'd') {
+      QuerySnapshot<Map<String, dynamic>> _getMemberUid =
+          await FirebaseFirestore.instance
+              .collection('all_chats')
+              .where('member_2', isEqualTo: uid)
+              .get();
+
+      List _responce = [];
+      for (QueryDocumentSnapshot<Map<String, dynamic>> el
+          in _getMemberUid.docs) {
+        QuerySnapshot<Map<String, dynamic>> _snapshot = await FirebaseFirestore
+            .instance
+            .collection('chats/' + el.data()['member_1'] + '/' + uid)
+            .orderBy('id_message', descending: false)
+            .get();
+  
+      }
+    }
+  }
+}

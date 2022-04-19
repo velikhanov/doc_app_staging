@@ -4,6 +4,7 @@ import 'package:doc_app/pages/calendar_page.dart';
 import 'package:doc_app/pages/chats_page.dart';
 import 'package:doc_app/pages/doc_page.dart';
 import 'package:doc_app/api/get_data.dart';
+import 'package:doc_app/pages/documents.dart';
 import 'package:doc_app/pages/test_page.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
@@ -209,7 +210,7 @@ class _HomeTabsState extends State<HomeTabs> with TickerProviderStateMixin {
                                       context,
                                       MaterialPageRoute(
                                           builder: (context) =>
-                                              const TestPage()),
+                                              const DocumentsPage()),
                                     );
                                   } else {
                                     null;
