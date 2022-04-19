@@ -1,12 +1,9 @@
 import 'dart:developer';
 
-import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:doc_app/api/get_data.dart';
 import 'package:doc_app/pages/chat_screen.dart';
-import 'package:doc_app/pages/home_page.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
-import 'package:doc_app/chat/message_model.dart';
 
 class ChatsPage extends StatelessWidget {
   const ChatsPage({Key? key}) : super(key: key);
@@ -217,7 +214,23 @@ class ChatsPage extends StatelessWidget {
                                   ),
                                   Container(
                                     alignment: Alignment.topLeft,
-                                    child: Text(
+                                    child: 
+                                    chat['attachment'].toString().isNotEmpty ?
+                                      chat['attachment'].toString().contains('.png')
+                                      || chat['attachment'].toString().contains('.jpg')
+                                      || chat['attachment'].toString().contains('.jpeg')
+                                      ? Row(
+                                        children: const [
+                                          Text('Приложено изображение ', style: TextStyle(color: Colors.grey,)),
+                                          Icon(Icons.image, size: 17, color: Colors.grey)
+                                        ],
+                                      ) : Row(
+                                        children: const [
+                                          Text('Приложен документ ', style: TextStyle(color: Colors.grey,)),
+                                          Icon(Icons.picture_as_pdf, size: 17, color: Colors.grey)
+                                        ],
+                                      )
+                                    : Text(
                                       chat['message'],
                                       style: const TextStyle(
                                         fontSize: 13,

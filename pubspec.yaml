@@ -40,6 +40,8 @@ dependencies:
   firebase_auth: ^3.3.9
   paged_vertical_calendar: ^1.0.6
   firebase_storage: ^10.2.12
+  file_picker: ^4.5.1
+  syncfusion_flutter_pdfviewer: ^20.1.50-beta
 
 dev_dependencies:
   flutter_test:

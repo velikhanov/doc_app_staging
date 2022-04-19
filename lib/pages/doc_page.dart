@@ -1029,6 +1029,13 @@ class DocPage extends StatelessWidget {
                                                                     .toString()))
                                                             .toString(),
                                                     true);
+                                              } else{
+                                                _showAvailableTime(
+                                                  _data?['name'],
+                                                  _data?['category'],
+                                                  _data?['uid'],
+                                                  FirebaseAuth.instance
+                                                      .currentUser!.uid);
                                               }
                                             } else {
                                               _showAvailableTime(

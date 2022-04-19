@@ -2,6 +2,8 @@ import 'dart:developer';
 
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:doc_app/api/get_data.dart';
+import 'package:doc_app/api/storage_service.dart';
+import 'package:file_picker/file_picker.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
 import 'package:intl/intl.dart';
@@ -18,13 +20,139 @@ class ChatScreen extends StatefulWidget {
 }
 
 class _ChatScreenState extends State<ChatScreen> {
-  _chatBubble(String message, time, bool isMe, bool isSameUser, bool firstMessage) {
+  String? path;
+  String? fileName;
+  Storage storage = Storage();
+  TextEditingController texFieldController = TextEditingController();
+
+Future _showImg(String _url) async {
+      return await showGeneralDialog(
+              context: context,
+              barrierDismissible: true,
+              barrierLabel:
+                  MaterialLocalizations.of(context).modalBarrierDismissLabel,
+              barrierColor: Colors.black45,
+              transitionDuration: const Duration(milliseconds: 200),
+              pageBuilder: (BuildContext buildContext, Animation animation,
+                  Animation secondaryAnimation) {
+               
+                return SafeArea(
+                  child: Material(
+                    child: Container(
+                      decoration: BoxDecoration(
+                        image: DecorationImage(
+                          image: NetworkImage(_url),
+                          fit: BoxFit.cover,
+                        ),
+                      ),
+                      child: Align(
+                        alignment: Alignment.topLeft,
+                        child: IconButton(
+                          onPressed: (() => Navigator.pop(context)), 
+                          icon: const Icon(Icons.arrow_back_ios, color: Colors.white,),
+                        ),
+                      ),
+                    ),
+                  ),
+                );
+    });
+  }
+
+  _chatBubble(String message, attachment, time, bool isMe, bool isSameUser, bool firstMessage, bool isImg, bool isDoc) {
     if (isMe) {
       return Column(
         children: <Widget>[
           Container(
             alignment: Alignment.topRight,
-            child: Container(
+            child: 
+              isImg == true || isDoc  == true ?
+            FutureBuilder(
+                future: attachment,
+                builder: (BuildContext context,
+                    AsyncSnapshot snapshot) {
+                  if (snapshot.hasError) {
+                    return const SizedBox(
+                      height: 90,
+                      width: 90,
+                      child:
+                      Center(child:  Text(
+                        "Ошибка загрузки..",
+                        style: TextStyle(
+                          fontSize: 20,
+                          fontWeight: FontWeight.bold,
+                        ),
+                        textAlign: TextAlign.center,
+                        ),
+                      ),
+                    );
+                  }
+
+                  if (snapshot.connectionState == ConnectionState.waiting) {
+                    return const SizedBox(
+                      height: 90,
+                      width: 90,
+                      child:
+                      Center(child:  Text(
+                        "Загрузка данных..",
+                        style: TextStyle(
+                          fontSize: 20,
+                          fontWeight: FontWeight.bold,
+                        ),
+                        textAlign: TextAlign.center,
+                        ),
+                      ),
+                    );
+                  }
+                  if (snapshot.hasData){
+                    var _data = snapshot.data;
+                    return Column(
+                      children: [
+                        const SizedBox(height: 2.5,),
+                        isImg == true && isDoc == false ?
+                          Container(
+                            height: 90,
+                            width: 90,
+                            decoration: BoxDecoration(
+                              color: Colors.transparent,
+                              image: DecorationImage(image: NetworkImage(_data), fit: BoxFit.cover),
+                            ),
+                            child: TextButton(
+                              onPressed: (() => _showImg(_data)),
+                              child: const SizedBox(),
+                            ),
+                          )
+                          : isImg == false && isDoc == true ?
+                          const SizedBox(
+                              height: 90,
+                              width: 90,
+                              child: IconButton(
+                              onPressed: null, 
+                              icon: Icon(Icons.picture_as_pdf, color: Colors.black, size: 90,),
+                            ),
+                          ) : const SizedBox(),
+                        const SizedBox(height: 2.5,)
+                      ],
+                    );
+                  }else{
+                    return const SizedBox(
+                      height: 90,
+                      width: 90,
+                      child:
+                      Center(child:  Text(
+                        "Ошибка загрузки..",
+                        style: TextStyle(
+                          fontSize: 20,
+                          fontWeight: FontWeight.bold,
+                        ),
+                        textAlign: TextAlign.center,
+                        ),
+                      ),
+                    );
+                  }
+                }
+              )
+              : 
+            Container(
               constraints: BoxConstraints(
                 maxWidth: MediaQuery.of(context).size.width * 0.80,
               ),
@@ -157,7 +285,6 @@ class _ChatScreenState extends State<ChatScreen> {
   }
 
   _sendMessageArea() {
-    TextEditingController texFieldController = TextEditingController();
     return Container(
       padding: const EdgeInsets.symmetric(horizontal: 8),
       height: 70,
@@ -165,10 +292,31 @@ class _ChatScreenState extends State<ChatScreen> {
       child: Row(
         children: <Widget>[
           IconButton(
-            icon: const Icon(Icons.photo),
+            icon: const Icon(Icons.attach_file),
             iconSize: 25,
             color: Theme.of(context).primaryColor,
-            onPressed: null,
+            onPressed: () async{
+              await FilePicker.platform.pickFiles(
+                allowMultiple: false,
+                type: FileType.custom,
+                allowedExtensions: ['png', 'jpg', 'pdf'],
+              ).then((value){
+                if(value == null){
+                  ScaffoldMessenger.of(context).showSnackBar(
+                    const SnackBar(
+                      content: Text('Ни один файл не был выбран'),
+                    ),
+                  );
+                }else{
+                  setState(() {
+                    path = value.files.single.path!;
+                    fileName = value.files.single.name;
+                    texFieldController = TextEditingController(text: value.files.single.name);
+                  });
+                }
+              });
+              
+            },
           ),
            Expanded(
             child: TextField(
@@ -192,11 +340,14 @@ class _ChatScreenState extends State<ChatScreen> {
                     if(item.data()['role'] == 'p'){
                       FirebaseFirestore.instance.collection('chats/' + FirebaseAuth.instance.currentUser!.uid + '/' + widget.userId.toString()).get().then((lastDocId){
                         for(var check in lastDocId.docs){
+                          String attachment = '';
+                          path != null && fileName != null ? attachment = fileName! : attachment;
                           if(check.data()['id_message'] > 0){
                             DocumentReference<Map<String, dynamic>> _message = FirebaseFirestore.instance.collection('chats/' + FirebaseAuth.instance.currentUser!.uid + '/' + widget.userId.toString()).doc((lastDocId.size + 1).toString());
                               _message.set({
                                 'id_message': lastDocId.size + 1,
-                                'message': texFieldController.text.trim(),
+                                'message': path != null && fileName != null ? '' : texFieldController.text.trim(),
+                                'attachment': attachment,
                                 'sender': FirebaseAuth.instance.currentUser!.uid,
                                 'member_1_email': FirebaseAuth.instance.currentUser!.email,
                                 // 'member_1': FirebaseAuth.instance.currentUser!.uid,
@@ -204,12 +355,16 @@ class _ChatScreenState extends State<ChatScreen> {
                                 'member_2_email': widget.userEmail,
                                 'timestamp': DateFormat('yyyy-MM-dd hh:mm').format(DateTime.now()),
                             });
+                            if(path != null && fileName != null){
+                              storage.uploadFile(path!, FirebaseAuth.instance.currentUser!.uid + '/' + widget.userId + '/' + fileName!);
+                            }
                               // texFieldController.clear();
                           }else{
                             DocumentReference<Map<String, dynamic>> _message = FirebaseFirestore.instance.collection('chats/' + FirebaseAuth.instance.currentUser!.uid + '/' + widget.userId.toString()).doc((lastDocId.size).toString());
                               _message.set({
                                 'id_message': lastDocId.size,
-                                'message': texFieldController.text.trim(),
+                                'message': path != null && fileName != null ? '' : texFieldController.text.trim(),
+                                'attachment': attachment,
                                 'sender': FirebaseAuth.instance.currentUser!.uid,
                                 'member_1_email': FirebaseAuth.instance.currentUser!.email,
                                 // 'member_1': FirebaseAuth.instance.currentUser!.uid,
@@ -218,17 +373,30 @@ class _ChatScreenState extends State<ChatScreen> {
                                 'timestamp': DateFormat('yyyy-MM-dd hh:mm').format(DateTime.now()),
                             });
                               // texFieldController.clear();
-                          }
+                            if(path != null && fileName != null){
+                              storage.uploadFile(path!, FirebaseAuth.instance.currentUser!.uid + '/' + widget.userId + '/' + fileName!);
+                            }                          }
                         }
-                      }).then((v) => texFieldController.clear());
+                      }).then((v){
+                        // texFieldController.clear();
+                        setState(() {
+                          path = null;
+                          fileName = null;
+                          // texFieldController = TextEditingController();
+                          texFieldController.clear();
+                        });
+                      });
                     }else if(item.data()['role'] == 'd'){
                       FirebaseFirestore.instance.collection('chats/' + widget.userId.toString() + '/' + FirebaseAuth.instance.currentUser!.uid).get().then((lastDocId){
                         for(var check in lastDocId.docs){
+                          String attachment = '';
+                          path != null && fileName != null ? attachment = fileName! : attachment;
                           if(check.data()['id_message'] > 0){
                             DocumentReference<Map<String, dynamic>> _message = FirebaseFirestore.instance.collection('chats/' + widget.userId.toString() + '/' + FirebaseAuth.instance.currentUser!.uid).doc((lastDocId.size + 1).toString());
                               _message.set({
                                 'id_message': lastDocId.size + 1,
-                                'message': texFieldController.text.trim(),
+                                'message': path != null && fileName != null ? '' : texFieldController.text.trim(),
+                                'attachment': attachment,
                                 'sender': FirebaseAuth.instance.currentUser!.uid,
                                 'member_1_email': FirebaseAuth.instance.currentUser!.email,
                                 // 'member_1': FirebaseAuth.instance.currentUser!.uid,
@@ -236,12 +404,16 @@ class _ChatScreenState extends State<ChatScreen> {
                                 'member_2_email': widget.userEmail,
                                 'timestamp': DateFormat('yyyy-MM-dd hh:mm').format(DateTime.now()),
                             });
-                              // texFieldController.clear();
+                            if(path != null && fileName != null){
+                              storage.uploadFile(path!, FirebaseAuth.instance.currentUser!.uid + '/' + widget.userId + '/' + fileName!);
+                            }                               
+                            // texFieldController.clear();
                           }else{
                             DocumentReference<Map<String, dynamic>> _message = FirebaseFirestore.instance.collection('chats/' +  widget.userId.toString() + '/' + FirebaseAuth.instance.currentUser!.uid).doc((lastDocId.size).toString());
                               _message.set({
                                 'id_message': lastDocId.size,
-                                'message': texFieldController.text.trim(),
+                                'message': path != null && fileName != null ? '' : texFieldController.text.trim(),
+                                'attachment': attachment,
                                 'sender': FirebaseAuth.instance.currentUser!.uid,
                                 'member_1_email': FirebaseAuth.instance.currentUser!.email,
                                 // 'member_1': FirebaseAuth.instance.currentUser!.uid,
@@ -249,10 +421,21 @@ class _ChatScreenState extends State<ChatScreen> {
                                 'member_2_email': widget.userEmail,
                                 'timestamp': DateFormat('yyyy-MM-dd hh:mm').format(DateTime.now()),
                             });
-                              // texFieldController.clear();
+                            if(path != null && fileName != null){
+                              storage.uploadFile(path!, FirebaseAuth.instance.currentUser!.uid + '/' + widget.userId + '/' + fileName!);
+                            }                               
+                            // texFieldController.clear();
                           }
                         }
-                      }).then((v) => texFieldController.clear());
+                      }).then((v){
+                        // texFieldController.clear();
+                        setState(() {
+                          path = null;
+                          fileName = null;
+                          // texFieldController = TextEditingController();
+                          texFieldController.clear();
+                        });
+                      });
                     }
                   }
                 });
@@ -391,7 +574,15 @@ class _ChatScreenState extends State<ChatScreen> {
                           // nextUserId = snapshot.data!.docs[nextIndex]['sender'];
                           bool firstMessage = index == 0;
                           final bool isSameUser = prevUserId == _data['sender'];
-                          return _chatBubble(message, time, isMe, isSameUser, firstMessage);
+                          if(_data['attachment'].toString().isNotEmpty){
+                            bool isDoc = _data['attachment'].toString().contains('.pdf');
+                            bool isImg = _data['attachment'].toString().contains('.png')
+                                      || _data['attachment'].toString().contains('.jpg')
+                                      || _data['attachment'].toString().contains('.jpeg');
+                            return _chatBubble(message, storage.getImg(FirebaseAuth.instance.currentUser!.uid + '/' + widget.userId + '/' + _data['attachment']), time, isMe, isSameUser, firstMessage, isImg, isDoc);
+                          }else{
+                            return _chatBubble(message, '', time, isMe, isSameUser, firstMessage, false, false);
+                          }
                         });
                     }else{
                       return Column(
