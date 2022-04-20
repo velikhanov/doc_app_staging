@@ -31,6 +31,7 @@ class _DocumentsPageState extends State<DocumentsPage> {
         }
     });
   }
+  int _routeStack = 0;
   bool _isFirstPage = true;
   var _allDocs = getDocuments(FirebaseAuth.instance.currentUser!.uid, true);
 
@@ -150,6 +151,7 @@ class _DocumentsPageState extends State<DocumentsPage> {
                         onTap: (() => setState(() {
                         _isFirstPage = false;
                         _allDocs = getDocuments(FirebaseAuth.instance.currentUser!.uid, false, email: _data);
+                        _routeStack++;
                       })),
                         title: Text(_data,
                             style: const TextStyle(
@@ -315,7 +317,17 @@ class _DocumentsPageState extends State<DocumentsPage> {
         alignment: Alignment.topLeft,
         child: 
           IconButton(
-            onPressed: (() => Navigator.pop(context)),
+            onPressed: () {
+              if(_routeStack > 0){
+                setState(() {
+                  _isFirstPage = true;
+                  _allDocs = getDocuments(FirebaseAuth.instance.currentUser!.uid, true);
+                  _routeStack--;
+                });
+              }else{
+                Navigator.pop(context);
+              }
+            },
             icon: const Icon(Icons.arrow_back_ios, color: Colors.black),
           ),
       ),
