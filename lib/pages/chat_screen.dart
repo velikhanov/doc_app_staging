@@ -50,7 +50,7 @@ Future _showAttachment(String _url, bool isImg) async {
                       child: Align(
                         alignment: Alignment.topLeft,
                         child: IconButton(
-                          onPressed: (() => Navigator.pop(context)), 
+                          onPressed: (() => Navigator.pop(buildContext)), 
                           icon: const Icon(Icons.arrow_back_ios, color: Colors.white,),
                         ),
                       ),
@@ -66,7 +66,7 @@ Future _showAttachment(String _url, bool isImg) async {
                         Align(
                           alignment: Alignment.topLeft,
                           child: IconButton(
-                            onPressed: (() => Navigator.pop(context)), 
+                            onPressed: (() => Navigator.pop(buildContext)), 
                             icon: const Icon(Icons.arrow_back_ios, color: Colors.black,),
                           ),
                         ),

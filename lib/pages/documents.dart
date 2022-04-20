@@ -3,6 +3,7 @@ import 'dart:developer';
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:doc_app/api/get_data.dart';
 import 'package:doc_app/api/storage_service.dart';
+import 'package:doc_app/pages/home_page.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
 import 'package:syncfusion_flutter_pdfviewer/pdfviewer.dart';
@@ -16,7 +17,7 @@ class DocumentsPage extends StatefulWidget {
 
 class _DocumentsPageState extends State<DocumentsPage> {
   bool? isDoc;
-
+  String? _email;
   @override
   void initState() {
     super.initState();
@@ -59,7 +60,7 @@ class _DocumentsPageState extends State<DocumentsPage> {
                       child: Align(
                         alignment: Alignment.topLeft,
                         child: IconButton(
-                          onPressed: (() => Navigator.pop(context)), 
+                          onPressed: (() => Navigator.pop(buildContext)), 
                           icon: const Icon(Icons.arrow_back_ios, color: Colors.white,),
                         ),
                       ),
@@ -75,7 +76,7 @@ class _DocumentsPageState extends State<DocumentsPage> {
                         Align(
                           alignment: Alignment.topLeft,
                           child: IconButton(
-                            onPressed: (() => Navigator.pop(context)), 
+                            onPressed: (() => Navigator.pop(buildContext)), 
                             icon: const Icon(Icons.arrow_back_ios, color: Colors.black,),
                           ),
                         ),
@@ -89,13 +90,63 @@ class _DocumentsPageState extends State<DocumentsPage> {
   
   @override
   Widget build(BuildContext context) {
-    return SafeArea(
-      child: Material(
-        color: const Color.fromARGB(255, 255, 255, 255),
-        child: Stack(
-    children: [
+    return Scaffold(
+      backgroundColor: const Color(0xFFF6F6F6),
+      appBar: AppBar(
+        // brightness: Brightness.dark,
+        centerTitle: true,
+        title: RichText(
+          textAlign: TextAlign.center,
+          text: TextSpan(
+            children: [
+              TextSpan(
+                  text: _routeStack > 0 ? _email : 'Все вложения',
+                  style: const TextStyle(
+                    fontSize: 16,
+                    fontWeight: FontWeight.bold,
+                  )),
+            ],
+          ),
+        ),
+        leading: 
+          Padding(
+            padding: const EdgeInsets.only(left: 20),
+              child: IconButton(
+                icon: const Icon(Icons.arrow_back_ios),
+                color: Colors.white,
+                onPressed: () {
+                    if(_routeStack > 0){
+                      setState(() {
+                        _isFirstPage = true;
+                        _allDocs = getDocuments(FirebaseAuth.instance.currentUser!.uid, true);
+                        _routeStack--;
+                        _email = null;
+                      });
+                    }else{
+                      Navigator.pop(context);
+                    }}
+                ),
+            ),
+            actions: [
+              _routeStack > 0 ?
+              Padding(
+                padding: const EdgeInsets.only(right: 10),
+                  child: IconButton(
+                    icon: const Icon(Icons.home),
+                    color: Colors.white,
+                    onPressed: (() => Navigator.push(context, MaterialPageRoute(builder: (_) => const HomePage(false, ''),))),
+                  )) : const SizedBox(),
+            ],
+      ),
+      body: 
+    // SafeArea(
+    //   child: Material(
+    //     color: const Color.fromARGB(255, 255, 255, 255),
+    //     child: 
+    //     Stack(
+    // children: [
       Padding(
-          padding: const EdgeInsets.only(top: 50, left: 10, right: 10, bottom: 10),
+          padding: EdgeInsets.only(top: _routeStack > 0 ? 15 : 5, bottom: _routeStack > 0 ? 15 : 5),
           child: 
     FutureBuilder(
       future: _allDocs,
@@ -151,6 +202,7 @@ class _DocumentsPageState extends State<DocumentsPage> {
                         onTap: (() => setState(() {
                         _isFirstPage = false;
                         _allDocs = getDocuments(FirebaseAuth.instance.currentUser!.uid, false, email: _data);
+                        _email = _data;
                         _routeStack++;
                       })),
                         title: Text(_data,
@@ -312,27 +364,41 @@ class _DocumentsPageState extends State<DocumentsPage> {
         }
       }
     ),
-      ),
-     Align(
-        alignment: Alignment.topLeft,
-        child: 
-          IconButton(
-            onPressed: () {
-              if(_routeStack > 0){
-                setState(() {
-                  _isFirstPage = true;
-                  _allDocs = getDocuments(FirebaseAuth.instance.currentUser!.uid, true);
-                  _routeStack--;
-                });
-              }else{
-                Navigator.pop(context);
-              }
-            },
-            icon: const Icon(Icons.arrow_back_ios, color: Colors.black),
-          ),
-      ),
-    ],
-        ),
+      // ),
+      // Padding(
+      //   padding: const EdgeInsets.symmetric(horizontal: 10),
+      //   child: Row(
+      //     mainAxisAlignment: MainAxisAlignment.spaceBetween,
+      //     children: <Widget>[
+      //       IconButton(
+      //         onPressed: () {
+      //           if(_routeStack > 0){
+      //             setState(() {
+      //               _isFirstPage = true;
+      //               _allDocs = getDocuments(FirebaseAuth.instance.currentUser!.uid, true);
+      //               _routeStack--;
+      //             });
+      //           }else{
+      //             Navigator.pop(context);
+      //           }
+      //         },
+      //           icon: const Icon(Icons.arrow_back_ios, color: Colors.black),
+      //         ),
+      //       _routeStack > 0 ?
+      //         IconButton(
+      //           onPressed: (() => Navigator.push(
+      //             context,
+      //             MaterialPageRoute(
+      //               builder: (_) => const HomePage(false, ''),
+      //             ))),
+      //             icon: const Icon(Icons.home, color: Colors.black),
+      //           )
+      //         : const SizedBox(),
+      //     ],
+      //   ),
+      // ),
+    // ],
+    //     ),
       ),
     );
   }
