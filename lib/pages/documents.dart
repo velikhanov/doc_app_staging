@@ -15,7 +15,22 @@ class DocumentsPage extends StatefulWidget {
 }
 
 class _DocumentsPageState extends State<DocumentsPage> {
-  
+  bool? isDoc;
+
+  @override
+  void initState() {
+    super.initState();
+    FirebaseFirestore.instance.collection('roles')
+    .where('uid', isEqualTo: FirebaseAuth.instance.currentUser!.uid)
+    .get()
+    .then((e) {
+        if(e.docs[0].data()['role'] == 'p'){
+          isDoc = false;
+        }else if(e.docs[0].data()['role'] == 'd'){
+          isDoc = true;
+        }
+    });
+  }
   bool _isFirstPage = true;
   var _allDocs = getDocuments(FirebaseAuth.instance.currentUser!.uid, true);
 
@@ -75,7 +90,7 @@ class _DocumentsPageState extends State<DocumentsPage> {
   Widget build(BuildContext context) {
     return SafeArea(
       child: Material(
-        color: Color.fromARGB(255, 177, 191, 200),
+        color: const Color.fromARGB(255, 255, 255, 255),
         child: Stack(
     children: [
       Padding(
@@ -162,7 +177,15 @@ class _DocumentsPageState extends State<DocumentsPage> {
               // Generate 100 widgets that display their index in the List.
               children: List.generate(snapshot.data.length, (index) {
                 var _data = snapshot.data[index];
-                var attachment = Storage().getImg(FirebaseAuth.instance.currentUser!.uid + '/' + _data['member_2'] + '/' + _data['attachment']);
+                var attachment = Storage().getImg(
+                  isDoc == true && FirebaseAuth.instance.currentUser!.uid == _data['sender'] 
+                  ? _data['member_2'] + '/' + FirebaseAuth.instance.currentUser!.uid + '/' + _data['attachment'] 
+                  : isDoc == true && FirebaseAuth.instance.currentUser!.uid != _data['sender'] 
+                  ? _data['sender'] + '/' + FirebaseAuth.instance.currentUser!.uid + '/' + _data['attachment']
+                  : isDoc == false && FirebaseAuth.instance.currentUser!.uid == _data['sender']
+                  ? FirebaseAuth.instance.currentUser!.uid + '/' + _data['member_2'] + '/' + _data['attachment']
+                  : FirebaseAuth.instance.currentUser!.uid + '/' + _data['member_2'] + '/' + _data['attachment']
+                );
                   return FutureBuilder(
                     future: attachment,
                     builder: (BuildContext context,

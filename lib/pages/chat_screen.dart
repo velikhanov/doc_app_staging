@@ -78,14 +78,14 @@ Future _showAttachment(String _url, bool isImg) async {
     });
   }
 
-  _chatBubble(String message, attachment, time, bool isMe, bool isSameUser, bool firstMessage, bool isImg, bool isDoc) {
+  _chatBubble(String message, attachment, time, bool isMe, bool isSameUser, bool firstMessage, bool isImg, bool isDocument) {
     if (isMe) {
       return Column(
         children: <Widget>[
           Container(
             alignment: Alignment.topRight,
             child: 
-              isImg == true || isDoc  == true ?
+              isImg == true || isDocument  == true ?
             FutureBuilder(
                 future: attachment,
                 builder: (BuildContext context,
@@ -128,7 +128,7 @@ Future _showAttachment(String _url, bool isImg) async {
                     return Column(
                       children: [
                         const SizedBox(height: 2.5,),
-                        isImg == true && isDoc == false ?
+                        isImg == true && isDocument == false ?
                           Container(
                             height: 90,
                             width: 90,
@@ -141,7 +141,7 @@ Future _showAttachment(String _url, bool isImg) async {
                               child: const SizedBox(),
                             ),
                           )
-                          : isImg == false && isDoc == true ?
+                          : isImg == false && isDocument == true ?
                             SizedBox(
                               height: 90,
                               width: 90,
@@ -241,7 +241,7 @@ Future _showAttachment(String _url, bool isImg) async {
           Container(
             alignment: Alignment.topLeft,
             child: 
-              isImg == true || isDoc  == true ?
+              isImg == true || isDocument  == true ?
             FutureBuilder(
                 future: attachment,
                 builder: (BuildContext context,
@@ -284,7 +284,7 @@ Future _showAttachment(String _url, bool isImg) async {
                     return Column(
                       children: [
                         const SizedBox(height: 2.5,),
-                        isImg == true && isDoc == false ?
+                        isImg == true && isDocument == false ?
                           Container(
                             height: 90,
                             width: 90,
@@ -297,7 +297,7 @@ Future _showAttachment(String _url, bool isImg) async {
                               child: const SizedBox(),
                             ),
                           )
-                          : isImg == false && isDoc == true ?
+                          : isImg == false && isDocument == true ?
                             SizedBox(
                               height: 90,
                               width: 90,
@@ -463,7 +463,11 @@ Future _showAttachment(String _url, bool isImg) async {
                                 'timestamp': DateFormat('yyyy-MM-dd hh:mm').format(DateTime.now()),
                             });
                             if(path != null && fileName != null){
-                              storage.uploadFile(path!, FirebaseAuth.instance.currentUser!.uid + '/' + widget.userId + '/' + fileName!);
+                              if(isDoc == true){
+                                storage.uploadFile(path!, widget.userId + '/' + FirebaseAuth.instance.currentUser!.uid + '/' + fileName!);
+                              }else{
+                                storage.uploadFile(path!, FirebaseAuth.instance.currentUser!.uid + '/' + widget.userId + '/' + fileName!);
+                              }
                             }
                               // texFieldController.clear();
                           }else{
@@ -481,8 +485,12 @@ Future _showAttachment(String _url, bool isImg) async {
                             });
                               // texFieldController.clear();
                             if(path != null && fileName != null){
-                              storage.uploadFile(path!, FirebaseAuth.instance.currentUser!.uid + '/' + widget.userId + '/' + fileName!);
-                            }                          }
+                              if(isDoc == true){
+                                storage.uploadFile(path!, widget.userId + '/' + FirebaseAuth.instance.currentUser!.uid + '/' + fileName!);
+                              }else{
+                                storage.uploadFile(path!, FirebaseAuth.instance.currentUser!.uid + '/' + widget.userId + '/' + fileName!);
+                              }
+                            }                        }
                         }
                       }).then((v){
                         // texFieldController.clear();
@@ -512,8 +520,12 @@ Future _showAttachment(String _url, bool isImg) async {
                                 'timestamp': DateFormat('yyyy-MM-dd hh:mm').format(DateTime.now()),
                             });
                             if(path != null && fileName != null){
-                              storage.uploadFile(path!, FirebaseAuth.instance.currentUser!.uid + '/' + widget.userId + '/' + fileName!);
-                            }                               
+                              if(isDoc == true){
+                                storage.uploadFile(path!, widget.userId + '/' + FirebaseAuth.instance.currentUser!.uid + '/' + fileName!);
+                              }else{
+                                storage.uploadFile(path!, FirebaseAuth.instance.currentUser!.uid + '/' + widget.userId + '/' + fileName!);
+                              }
+                            }                              
                             // texFieldController.clear();
                           }else{
                             DocumentReference<Map<String, dynamic>> _message = FirebaseFirestore.instance.collection('chats/' +  widget.userId.toString() + '/' + FirebaseAuth.instance.currentUser!.uid).doc((lastDocId.size).toString());
@@ -529,8 +541,12 @@ Future _showAttachment(String _url, bool isImg) async {
                                 'timestamp': DateFormat('yyyy-MM-dd hh:mm').format(DateTime.now()),
                             });
                             if(path != null && fileName != null){
-                              storage.uploadFile(path!, FirebaseAuth.instance.currentUser!.uid + '/' + widget.userId + '/' + fileName!);
-                            }                               
+                              if(isDoc == true){
+                                storage.uploadFile(path!, widget.userId + '/' + FirebaseAuth.instance.currentUser!.uid + '/' + fileName!);
+                              }else{
+                                storage.uploadFile(path!, FirebaseAuth.instance.currentUser!.uid + '/' + widget.userId + '/' + fileName!);
+                              }
+                            }                              
                             // texFieldController.clear();
                           }
                         }
@@ -555,6 +571,7 @@ Future _showAttachment(String _url, bool isImg) async {
   }
   
   Stream<QuerySnapshot<Map<String, dynamic>>>? _chatMessages;
+  bool? isDoc;
   @override
     void initState() {
       super.initState();
@@ -564,10 +581,12 @@ Future _showAttachment(String _url, bool isImg) async {
           if(item.data()['role'] == 'p'){
             setState(() {
               _chatMessages = getChatMessages('chats/' + FirebaseAuth.instance.currentUser!.uid + '/' + widget.userId);
+              isDoc = false;
             });
           }else if(item.data()['role'] == 'd'){
             setState(() {
               _chatMessages = getChatMessages('chats/' + widget.userId + '/' + FirebaseAuth.instance.currentUser!.uid);
+              isDoc = true;
             });
         }
         }
@@ -682,11 +701,12 @@ Future _showAttachment(String _url, bool isImg) async {
                           bool firstMessage = index == 0;
                           final bool isSameUser = prevUserId == _data['sender'];
                           if(_data['attachment'].toString().isNotEmpty){
-                            bool isDoc = _data['attachment'].toString().contains('.pdf');
+                            bool isDocument = _data['attachment'].toString().contains('.pdf');
                             bool isImg = _data['attachment'].toString().contains('.png')
                                       || _data['attachment'].toString().contains('.jpg')
                                       || _data['attachment'].toString().contains('.jpeg');
-                            return _chatBubble(message, storage.getImg(FirebaseAuth.instance.currentUser!.uid + '/' + widget.userId + '/' + _data['attachment']), time, isMe, isSameUser, firstMessage, isImg, isDoc);
+                                      
+                            return _chatBubble(message, storage.getImg(isDoc == true ? widget.userId + '/' + FirebaseAuth.instance.currentUser!.uid + '/' + _data['attachment'] : FirebaseAuth.instance.currentUser!.uid + '/' + widget.userId + '/' + _data['attachment']), time, isMe, isSameUser, firstMessage, isImg, isDocument);
                           }else{
                             return _chatBubble(message, '', time, isMe, isSameUser, firstMessage, false, false);
                           }
