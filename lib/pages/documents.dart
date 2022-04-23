@@ -1,5 +1,3 @@
-import 'dart:developer';
-
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:doc_app/api/get_data.dart';
 import 'package:doc_app/api/storage_service.dart';
@@ -197,7 +195,7 @@ class _DocumentsPageState extends State<DocumentsPage> {
               itemBuilder: (context, index) {
                 var _data = snapshot.data![index];
                   return Card(
-                    color: const Color.fromARGB(255, 0, 115, 153),
+                    color: const Color.fromARGB(255, 152, 215, 225),
                     child: ListTile(
                         onTap: (() => setState(() {
                         _isFirstPage = false;
@@ -214,7 +212,7 @@ class _DocumentsPageState extends State<DocumentsPage> {
                             //     fontWeight: FontWeight.bold)),
                         leading: const CircleAvatar(
                             backgroundImage: AssetImage(
-                                'assets/images/checklist.png')),
+                                'assets/images/attachment.png')),
                         // trailing: Icon(Icons.access_time_filled, color: Colors.black,)));
                         trailing: const Icon(
                           Icons.document_scanner,
@@ -249,14 +247,15 @@ class _DocumentsPageState extends State<DocumentsPage> {
                           height: 90,
                           width: 90,
                           child:
-                          Center(child:  Text(
-                            "Ошибка загрузки..",
-                            style: TextStyle(
-                              fontSize: 20,
-                              fontWeight: FontWeight.bold,
-                            ),
-                            textAlign: TextAlign.center,
-                            ),
+                          Center(child:  
+                            Text(
+                              "Ошибка загрузки..",
+                              style: TextStyle(
+                                fontSize: 20,
+                                fontWeight: FontWeight.bold,
+                              ),
+                              textAlign: TextAlign.center,
+                              ),
                           ),
                         );
                       }

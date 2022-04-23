@@ -1,5 +1,3 @@
-import 'dart:developer';
-
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:doc_app/api/get_data.dart';
 import 'package:doc_app/api/storage_service.dart';
@@ -8,8 +6,6 @@ import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
 import 'package:intl/intl.dart';
 import 'package:syncfusion_flutter_pdfviewer/pdfviewer.dart';
-// import 'package:doc_app/chat/message_model.dart';
-// import 'package:doc_app/chat/user_model.dart';
 
 class ChatScreen extends StatefulWidget {
   final String userId;

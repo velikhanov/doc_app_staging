@@ -1,3 +1,6 @@
+import 'dart:developer';
+
+import 'package:awesome_notifications/awesome_notifications.dart';
 import 'package:doc_app/auth/auth_service.dart';
 import 'package:doc_app/auth/signin_page.dart';
 import 'package:doc_app/pages/home_page.dart';
@@ -8,6 +11,27 @@ import 'package:provider/provider.dart';
 
 Future<void> main() async {
   WidgetsFlutterBinding.ensureInitialized();
+  AwesomeNotifications().actionStream.listen((event) {});
+  AwesomeNotifications().initialize(
+      null,
+      [
+        NotificationChannel(
+          channelKey: "doc_app_reminder_key_1",
+          channelName: "Doctor Application Reminder",
+          channelDescription: "Doctor Application Reminder",
+          defaultColor: const Color(0XFF9050DD),
+          importance: NotificationImportance.Max,
+          ledColor: Colors.white,
+          playSound: true,
+          enableLights: true,
+          enableVibration: true
+        )
+      ],
+      channelGroups: [
+        NotificationChannelGroup(channelGroupkey: 'doc_app_reminder_key_1', channelGroupName: 'Doctor Application Reminder'),
+      ],
+      debug: true
+  );
   await Firebase.initializeApp();
   runApp(const MyApp());
 }

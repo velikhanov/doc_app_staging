@@ -5,7 +5,6 @@ import 'package:doc_app/pages/chats_page.dart';
 import 'package:doc_app/pages/doc_page.dart';
 import 'package:doc_app/api/get_data.dart';
 import 'package:doc_app/pages/documents.dart';
-import 'package:doc_app/pages/test_page.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
@@ -145,159 +144,164 @@ class _HomeTabsState extends State<HomeTabs> with TickerProviderStateMixin {
                   }
                   if (snapshot.hasData) {
                     // var data = snapshot.data!.data();
-                    return Column(
-                      children: <Widget>[
-                        _displayBack == true
-                            ? IconButton(
-                                onPressed: _returnOneStep,
-                                icon: const Icon(
-                                  Icons.arrow_back_sharp,
-                                ),
-                                tooltip: 'Назад',
-                              )
-                            : const SizedBox(height: 0),
-                        SingleChildScrollView(
-                          child: Column(
-                            mainAxisAlignment: MainAxisAlignment.spaceAround,
-                            crossAxisAlignment: CrossAxisAlignment.center,
-                            // children: snapshot.data!.data()!.docs
-                            children: snapshot.data!.docs
-                                .map<Widget>((DocumentSnapshot document) {
-                              Map<String, dynamic> data =
-                                  document.data()! as Map<String, dynamic>;
-                              return GestureDetector(
-                                onTap: () {
-                                  if (data['is_subcat'] == null &&
-                                      data['is_nestedcat'] != null &&
-                                      data['is_nestedcat'] == true) {
-                                    _initCategories('categories/' +
-                                        data['id_category'].toString() +
-                                        '/doctors');
-                                  } else if (data['is_subcat'] != null &&
-                                      data['is_nestedcat'] == null) {
-                                    _initCategories('doctors/' +
-                                        data['id_category'].toString() +
-                                        '/' +
-                                        data['id_category'].toString());
-                                  } else if ((data['is_nestedcat'] != null &&
-                                          data['is_nestedcat'] == true) ||
-                                      (data['is_nestedcat'] == null)) {
-                                    Navigator.push(
-                                      context,
-                                      MaterialPageRoute(
-                                          builder: (context) => DocPage(
-                                              'doctors/' +
-                                                  data['id_category']
-                                                      .toString() +
-                                                  '/' +
-                                                  data['id_category']
-                                                      .toString(),
-                                              data['id_doctor'])),
-                                    );
-                                  } else if (data['is_nestedcat'] != null &&
-                                      data['is_nestedcat'] == false &&
-                                      data['id_category'].toInt() == 2) {
-                                    Navigator.push(
-                                      context,
-                                      MaterialPageRoute(
-                                          builder: (context) =>
-                                              const ChatsPage()),
-                                    );
-                                  } else if (data['is_nestedcat'] != null &&
-                                      data['is_nestedcat'] == false &&
-                                      data['id_category'].toInt() == 3) {
-                                    Navigator.push(
-                                      context,
-                                      MaterialPageRoute(
-                                          builder: (context) =>
-                                              const DocumentsPage()),
-                                    );
-                                  } else {
-                                    null;
-                                  }
-                                },
-                                child: Card(
-                                  margin: const EdgeInsets.all(12),
-                                  elevation: 4,
-                                  color: const Color.fromRGBO(64, 75, 96, .9),
-                                  child: Padding(
-                                    padding: const EdgeInsets.symmetric(
-                                        vertical: 8.0, horizontal: 16),
-                                    child: Row(
-                                      children: <Widget>[
-                                        Column(
-                                          crossAxisAlignment:
-                                              CrossAxisAlignment.start,
-                                          mainAxisSize: MainAxisSize.min,
-                                          children: <Widget>[
-                                            Row(
-                                              mainAxisAlignment: MainAxisAlignment.start,
-                                              crossAxisAlignment: CrossAxisAlignment.end,
-                                              children: <Widget>[
-                                                Padding(
-                                                  padding: const EdgeInsets.only(right: 1.5),
-                                                  child:
-                                                  Text(data['category'],
-                                                  style: const TextStyle(
-                                                      fontSize: 20,
-                                                      fontWeight:
-                                                          FontWeight.bold)),  
-                                                  ),
-                                                    (data['license'] != null &&
-                                                        data['license'] == 0) 
-                                                    ? const Icon(Icons.av_timer, color: Colors.yellow, size: 20,)
-                                                    : (data['license'] != null && 
-                                                          data['license'] == 1)
-                                                    ? const Icon(Icons.check, color: Colors.green, size: 20,)
-                                                    : (data['license'] != null && 
-                                                          data['license'] == 2)
-                                                        ? const Icon(Icons.close, color: Colors.red, size: 20,)
-                                                        : const SizedBox(width: 0, height: 0,)
-                                              ],
-                                            ),
-                                            data['name'] != null &&
-                                                    data['uid'] != null
-                                                ? Text(data['name'],
+                      return Column(
+                        mainAxisAlignment: snapshot.data.docs.isNotEmpty ? MainAxisAlignment.start : MainAxisAlignment.center,
+                        children: <Widget>[
+                          _displayBack == true
+                              ? IconButton(
+                                  onPressed: _returnOneStep,
+                                  icon: const Icon(
+                                    Icons.arrow_back_sharp,
+                                    color: Colors.blue,
+                                    size: 30,
+                                  ),
+                                  tooltip: 'Назад',
+                                )
+                              : const SizedBox(height: 0),
+                        snapshot.data.docs.isNotEmpty ?
+                          SingleChildScrollView(
+                            child: Column(
+                              mainAxisAlignment: MainAxisAlignment.spaceAround,
+                              crossAxisAlignment: CrossAxisAlignment.center,
+                              // children: snapshot.data!.data()!.docs
+                              children: snapshot.data!.docs
+                                  .map<Widget>((DocumentSnapshot document) {
+                                Map<String, dynamic> data =
+                                    document.data()! as Map<String, dynamic>;
+                                return GestureDetector(
+                                  onTap: () {
+                                    if (data['is_subcat'] == null &&
+                                        data['is_nestedcat'] != null &&
+                                        data['is_nestedcat'] == true) {
+                                      _initCategories('categories/' +
+                                          data['id_category'].toString() +
+                                          '/doctors');
+                                    } else if (data['is_subcat'] != null &&
+                                        data['is_nestedcat'] == null) {
+                                      _initCategories('doctors/' +
+                                          data['id_category'].toString() +
+                                          '/' +
+                                          data['id_category'].toString());
+                                    } else if ((data['is_nestedcat'] != null &&
+                                            data['is_nestedcat'] == true) ||
+                                        (data['is_nestedcat'] == null)) {
+                                      Navigator.push(
+                                        context,
+                                        MaterialPageRoute(
+                                            builder: (context) => DocPage(
+                                                'doctors/' +
+                                                    data['id_category']
+                                                        .toString() +
+                                                    '/' +
+                                                    data['id_category']
+                                                        .toString(),
+                                                data['id_doctor'])),
+                                      );
+                                    } else if (data['is_nestedcat'] != null &&
+                                        data['is_nestedcat'] == false &&
+                                        data['id_category'].toInt() == 2) {
+                                      Navigator.push(
+                                        context,
+                                        MaterialPageRoute(
+                                            builder: (context) =>
+                                                const ChatsPage()),
+                                      );
+                                    } else if (data['is_nestedcat'] != null &&
+                                        data['is_nestedcat'] == false &&
+                                        data['id_category'].toInt() == 3) {
+                                      Navigator.push(
+                                        context,
+                                        MaterialPageRoute(
+                                            builder: (context) =>
+                                                const DocumentsPage()),
+                                      );
+                                    } else {
+                                      null;
+                                    }
+                                  },
+                                  child: Card(
+                                    margin: const EdgeInsets.all(12),
+                                    elevation: 4,
+                                    color: const Color.fromRGBO(64, 75, 96, .9),
+                                    child: Padding(
+                                      padding: const EdgeInsets.symmetric(
+                                          vertical: 8.0, horizontal: 16),
+                                      child: Row(
+                                        children: <Widget>[
+                                          Column(
+                                            crossAxisAlignment:
+                                                CrossAxisAlignment.start,
+                                            mainAxisSize: MainAxisSize.min,
+                                            children: <Widget>[
+                                              Row(
+                                                mainAxisAlignment: MainAxisAlignment.start,
+                                                crossAxisAlignment: CrossAxisAlignment.end,
+                                                children: <Widget>[
+                                                  Padding(
+                                                    padding: const EdgeInsets.only(right: 1.5),
+                                                    child:
+                                                    Text(data['category'],
                                                     style: const TextStyle(
                                                         fontSize: 20,
                                                         fontWeight:
-                                                            FontWeight.w400))
-                                                : data['name'] == null &&
-                                                        data['uid'] != null
-                                                    ? const Text(
-                                                        'Доктор Айболит',
-                                                        style: TextStyle(
-                                                            fontSize: 20,
-                                                            fontWeight:
-                                                                FontWeight
-                                                                    .w400))
-                                                    : const SizedBox(height: 0),
-                                            const SizedBox(height: 4),
-                                            // Text(data['first_name']! + ' ' + data['second_name']!, style: const TextStyle(color: Colors.white70)),
-                                            // Text(data['category'], style: const TextStyle(color: Colors.white70)),
-                                          ],
-                                        ),
-                                        const Spacer(),
-                                        CircleAvatar(
-                                          // backgroundColor: Colors.white,
-                                          // ignore: todo
-                                          // TODO: to check if image file exists to avoid problem with image loading when image name is incorrect in DB
-                                          backgroundImage: data['img'] != null && data['img'] != ""
-                                          ? AssetImage('assets/images/' + data['img'])
-                                          : const AssetImage('assets/images/home_img.png'),
-                                          // backgroundImage: AssetImage(
-                                          //     'assets/images/home_img.png'),
-                                        ),
-                                      ],
+                                                            FontWeight.bold)),  
+                                                    ),
+                                                      (data['license'] != null &&
+                                                          data['license'] == 0) 
+                                                      ? const Icon(Icons.av_timer, color: Colors.yellow, size: 20,)
+                                                      : (data['license'] != null && 
+                                                            data['license'] == 1)
+                                                      ? const Icon(Icons.check, color: Colors.green, size: 20,)
+                                                      : (data['license'] != null && 
+                                                            data['license'] == 2)
+                                                          ? const Icon(Icons.close, color: Colors.red, size: 20,)
+                                                          : const SizedBox(width: 0, height: 0,)
+                                                ],
+                                              ),
+                                              data['name'] != null &&
+                                                      data['uid'] != null
+                                                  ? Text(data['name'],
+                                                      style: const TextStyle(
+                                                          fontSize: 20,
+                                                          fontWeight:
+                                                              FontWeight.w400))
+                                                  : data['name'] == null &&
+                                                          data['uid'] != null
+                                                      ? const Text(
+                                                          'Доктор Айболит',
+                                                          style: TextStyle(
+                                                              fontSize: 20,
+                                                              fontWeight:
+                                                                  FontWeight
+                                                                      .w400))
+                                                      : const SizedBox(height: 0),
+                                              const SizedBox(height: 4),
+                                              // Text(data['first_name']! + ' ' + data['second_name']!, style: const TextStyle(color: Colors.white70)),
+                                              // Text(data['category'], style: const TextStyle(color: Colors.white70)),
+                                            ],
+                                          ),
+                                          const Spacer(),
+                                          CircleAvatar(
+                                            // backgroundColor: Colors.white,
+                                            // ignore: todo
+                                            // TODO: to check if image file exists to avoid problem with image loading when image name is incorrect in DB
+                                            backgroundImage: data['img'] != null && data['img'] != ""
+                                            ? AssetImage('assets/images/' + data['img'])
+                                            : const AssetImage('assets/images/home_img.png'),
+                                            // backgroundImage: AssetImage(
+                                            //     'assets/images/home_img.png'),
+                                          ),
+                                        ],
+                                      ),
                                     ),
                                   ),
-                                ),
-                              );
-                            }).toList(),
-                          ),
-                        ),
-                      ],
-                    );
+                                );
+                              }).toList(),
+                            ),
+                          )
+                        : const Text('Похоже здесь пока нет данных\n Нажмите на стрелку выше чтобы вернуться назад', textAlign: TextAlign.center, style: TextStyle(fontSize: 20, fontWeight: FontWeight.bold)),
+                        ],
+                      );
                   } else {
                     return
                         // Expanded(

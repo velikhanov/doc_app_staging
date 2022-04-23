@@ -1,5 +1,3 @@
-import 'dart:developer';
-
 import 'package:doc_app/api/get_data.dart';
 import 'package:doc_app/pages/chat_screen.dart';
 import 'package:firebase_auth/firebase_auth.dart';
