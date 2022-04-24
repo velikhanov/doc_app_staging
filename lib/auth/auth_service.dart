@@ -1,4 +1,5 @@
 import 'package:cloud_firestore/cloud_firestore.dart';
+import 'package:doc_app/api/reminder_service.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 
 class AuthenticationService {
@@ -69,6 +70,8 @@ class AuthenticationService {
           });
         }
       }
+      
+      await Reminder().createJson();
       return _result.user;
     } on FirebaseAuthException catch (e) {
       return e.message;

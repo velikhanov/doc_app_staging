@@ -49,6 +49,8 @@ class _HomePageState extends State<HomePage> {
                   ));
                   // Reminder().writeJson();
                   // Reminder().deleteFromJson(0);
+                  // Reminder().deleteJson();
+                  // Reminder().createJson();
               }
             ),
             icon: const Icon(Icons.add, size: 20,),

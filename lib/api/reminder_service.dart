@@ -1,7 +1,6 @@
-import 'dart:convert';
-import 'dart:developer';
 import 'dart:io';
-import 'package:flutter/services.dart';
+import 'dart:convert';
+import 'package:firebase_auth/firebase_auth.dart';
 import 'package:path_provider/path_provider.dart';
 
 
@@ -14,16 +13,13 @@ class Reminder{
 
     Future<File> get _localFile async {
       final path = await _localPath;
-      return File('$path/reminder.json');
+      return File(path + '/' + FirebaseAuth.instance.currentUser!.uid + '.json');
     }
 
     Future<File> writeJson(int id, String text, String desc, String time/*, int interval*/) async {
       final file = await _localFile;
-      // final String response = await rootBundle.loadString('assets/reminder.json');
       final decodedJson = await json.decode(await file.readAsString());
       decodedJson[(id > 0 ? id - 1 : 0).toString()] = {'id': id, 'text': text, 'desc': desc, 'time': time/*, 'interval': interval*/};
-      // decodedJson[(id > 0 ? id - 1 : 0).toString()] = {'text': text};
-      // decodedJson[(id > 0 ? id - 1 : 0).toString()] = {'desc': desc};
       await decodedJson.remove('count');
       decodedJson['count'] = id;
       
@@ -70,29 +66,27 @@ class Reminder{
       }
     }
 
-    // Future<Map> readJson() async {
-    //   final String response = await rootBundle.loadString('assets/reminder.json');
-    //   final data = await json.decode(response);
-    //   return await data;
-    // }
+    Future<File> createJson() async {
+      final file = await _localFile;
 
-    // Future<void> writeJson() async {
-    //   final String response = await rootBundle.loadString('assets/reminder.json');
-    //   final data = await json.decode(response);
-    //   // ... 
-    // }
+      await file.create();
 
-    // Future<void> updateJson() async{
-    //   final String response = await rootBundle.loadString('assets/reminder.json');
-    // }
+      Map result = {"count": 0};
 
-    // Future<void> deleteFromJson(int id) async{
-    //   final String response = await rootBundle.loadString('assets/reminder.json');
-    //   // final data = await json.decode(response)[id.toString()];
-    //   final data = await json.decode(response).remove(id.toString());
-    //   // var file = await File('reminder.json').writeAsString(json.encode(data));
-    //   file.writeAsString(json.encode(data));
-      
-    // }
+      return await file.writeAsString(json.encode(result));
+    }
+
+    Future<void> deleteJson() async {
+      try {
+        final file = await _localFile;
+
+        // Read the file
+      await file.delete();
+        // return await json.decode(contents);
+      } catch (e) {
+        // If encountering an error, return 0
+        return;
+      }
+    }
  }
    

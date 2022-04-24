@@ -19,20 +19,26 @@ class _ReminderPageState extends State<ReminderPage> {
   // Reminder reminder = Reminder();
 
   // Future<String> data = Reminder().readJson();
-  Future<void> _remindersLimitNotification() async{
+  Future<void> _remindersLimitNotification(String text, String type) async{
     Widget okButton = TextButton(
       child: const Text('Закрыть',
           style: TextStyle(fontSize: 20, fontWeight: FontWeight.bold),
           textAlign: TextAlign.center),
       onPressed: () {
+        if(type == 'time'){
+          Navigator.of(context).pop();
+        }else if(type == 'count'){
           Navigator.of(context)..pop()..pop();
+        }else{
+          Navigator.of(context).pop();
+        }
       },
     );
 
     AlertDialog alert = AlertDialog(
       // title: Text("My title"),
-      content: const Text('Вы достигли лимита для создания напоминаний',
-          style: TextStyle(fontSize: 20, fontWeight: FontWeight.bold),
+      content: Text(text,
+          style: const TextStyle(fontSize: 20, fontWeight: FontWeight.bold),
           textAlign: TextAlign.center),
       actions: [
         okButton,
@@ -57,8 +63,9 @@ class _ReminderPageState extends State<ReminderPage> {
         transitionDuration: const Duration(milliseconds: 200),
         pageBuilder: (BuildContext buildContext, Animation animation,
             Animation secondaryAnimation) {
-          final TimeOfDay now = TimeOfDay.now();
-          TimeOfDay time = now;
+          // final TimeOfDay now = TimeOfDay.now();
+          // TimeOfDay.fromDateTime(DateTime.now().add(const Duration(minutes: 1)));
+          TimeOfDay time = TimeOfDay.fromDateTime(DateTime.now().add(const Duration(minutes: 10)));
           // int dropdownvalue = 1;
           // List<int> _numbers = [
           //   1,
@@ -90,6 +97,7 @@ class _ReminderPageState extends State<ReminderPage> {
         TextEditingController subTitleFormController = TextEditingController();
         Future<void> notify(int id, String text, String desc, String time/*, int interval*/) async {
             // String timezone = await AwesomeNotifications().getLocalTimeZoneIdentifier();
+            // TODO check this => inspect(DateTime.parse(DateTime.now().year.toString() + DateTime.now().month.toString() + DateTime.now().day.toString() + time + ':00'));
             await AwesomeNotifications().createNotification(
               content: NotificationContent(
                 id: id,
@@ -99,7 +107,7 @@ class _ReminderPageState extends State<ReminderPage> {
               ),
               schedule:
                   // NotificationInterval(interval: 1/*interval * 60 * 60*/, timeZone: timezone, repeats: true),
-                        NotificationCalendar.fromDate(date: DateTime.parse(DateTime.now().year.toString() + DateTime.now().month.toString() + DateTime.now().day.toString() + time + ':00'), repeats: true),
+                        NotificationCalendar.fromDate(date: DateTime.parse(DateTime.now().year.toString() + '-' + (DateTime.now().month.toString().length < 2 ? '0' + DateTime.now().month.toString() : DateTime.now().month.toString()) + '-' + (DateTime.now().day.toString().length < 2 ? '0' + DateTime.now().day.toString() : DateTime.now().day.toString()) + ' ' + time + ':00'), repeats: true),
             ).then((value) async{
               if(value == true){
                 await Reminder().writeJson(id, text, desc, time/*, interval*/);
@@ -330,17 +338,22 @@ class _ReminderPageState extends State<ReminderPage> {
                                 // Timer.periodic(const Duration(minutes: 1), (timer) {
                                 //   if (DateTime.now()== DateTime.parse("2022-04-23 17:59:00")){
                                 //     timer.cancel();
-                                if(jsonResult.isNotEmpty && titleFormController.text.trim().isNotEmpty && subTitleFormController.text.trim().isNotEmpty && jsonResult['count'] < 5){
+                                  String notifyTime = (time.hour.toString() == '0' ? '00': time.hour.toString()) + ':' +(time.minute.toString().length < 2 ? '0' + time.minute.toString(): time.minute.toString());
+                                  DateTime timeNow = DateTime.parse(DateTime.now().year.toString() + '-' + (DateTime.now().month.toString().length < 2 ? '0' + DateTime.now().month.toString() : DateTime.now().month.toString()) + '-' + (DateTime.now().day.toString().length < 2 ? '0' + DateTime.now().day.toString() : DateTime.now().day.toString()) + ' ' + notifyTime + ':00');
+                                if(jsonResult.isNotEmpty && titleFormController.text.trim().isNotEmpty && subTitleFormController.text.trim().isNotEmpty && jsonResult['count'] < 5 && timeNow.millisecondsSinceEpoch > DateTime.now().millisecondsSinceEpoch){
                                   // await Reminder().writeJson(jsonResult['count'] + 1, titleFormController.text.trim(), subTitleFormController.text.trim())
                                   // .then((value){setState(() {});});
                                   // Navigator.pop(buildContext);
-                                  String notifyTime = (time.hour.toString() == '0' ? '00': time.hour.toString()) + ':' +(time.minute.toString().length < 2 ? '0' + time.minute.toString(): time.minute.toString());
                                   notify(jsonResult['count'] + 1, titleFormController.text.trim(), subTitleFormController.text.trim(), notifyTime/*, dropdownvalue*/).then((value){
                                     setState(() {});
                                     Navigator.pop(buildContext);
                                   });
+                                }else if(jsonResult.isNotEmpty && titleFormController.text.trim().isNotEmpty && subTitleFormController.text.trim().isNotEmpty && jsonResult['count'] < 5 && timeNow.millisecondsSinceEpoch < DateTime.now().millisecondsSinceEpoch){
+                                  await _remindersLimitNotification('Время напоминания должно быть в будущем', 'time');
+                                }else if(jsonResult.isNotEmpty && titleFormController.text.trim().isNotEmpty && subTitleFormController.text.trim().isNotEmpty && jsonResult['count'] >= 5 && timeNow.millisecondsSinceEpoch > DateTime.now().millisecondsSinceEpoch){
+                                  await _remindersLimitNotification('Вы достигли лимита доступных напоминаний', 'count');
                                 }else{
-                                  await _remindersLimitNotification();
+                                  await _remindersLimitNotification('Что то пошло не так, пожалуйста повторите попытку позже', 'else');
                                 }
                                     // notify(jsonResult['count'] + 1, titleFormController.text.trim(), subTitleFormController.text.trim(), time, dropdownvalue);
                                 //   }
@@ -420,7 +433,7 @@ class _ReminderPageState extends State<ReminderPage> {
                     //   return const Text('Загрузка данных', style: TextStyle(fontWeight: FontWeight.bold, fontSize: 20), textAlign: TextAlign.center,);
                     // }
                     if (snapshot.hasData) {
-                      if(snapshot.data['count'] > 0){
+                      if(snapshot.data['count'] != null && snapshot.data['count'] > 0){
                         return Column(
                         children: [
                       ListView.separated(
@@ -498,7 +511,7 @@ class _ReminderPageState extends State<ReminderPage> {
                         return Column(
                           mainAxisAlignment: MainAxisAlignment.center,
                           children: <Widget>[
-                            const Text('У вас нет активный напоминаний', style: TextStyle(fontWeight: FontWeight.bold, fontSize: 20), textAlign: TextAlign.center,),
+                            const Text('У вас нет активных напоминаний', style: TextStyle(fontWeight: FontWeight.bold, fontSize: 20), textAlign: TextAlign.center,),
                             const SizedBox(height: 10,),
                               TextButton(
                                 onPressed: () {
