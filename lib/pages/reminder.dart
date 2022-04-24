@@ -19,6 +19,34 @@ class _ReminderPageState extends State<ReminderPage> {
   // Reminder reminder = Reminder();
 
   // Future<String> data = Reminder().readJson();
+  Future<void> _remindersLimitNotification() async{
+    Widget okButton = TextButton(
+      child: const Text('Закрыть',
+          style: TextStyle(fontSize: 20, fontWeight: FontWeight.bold),
+          textAlign: TextAlign.center),
+      onPressed: () {
+          Navigator.of(context)..pop()..pop();
+      },
+    );
+
+    AlertDialog alert = AlertDialog(
+      // title: Text("My title"),
+      content: const Text('Вы достигли лимита для создания напоминаний',
+          style: TextStyle(fontSize: 20, fontWeight: FontWeight.bold),
+          textAlign: TextAlign.center),
+      actions: [
+        okButton,
+      ],
+    );
+
+    // show the dialog
+    return await showDialog(
+      context: context,
+      builder: (BuildContext context) {
+        return alert;
+      },
+    );
+  }
   Future _createReminder() async {
     return await showGeneralDialog(
         context: context,
@@ -31,50 +59,52 @@ class _ReminderPageState extends State<ReminderPage> {
             Animation secondaryAnimation) {
           final TimeOfDay now = TimeOfDay.now();
           TimeOfDay time = now;
-          int dropdownvalue = 1;
-          List<int> _numbers = [
-            1,
-            2,
-            3,
-            4,
-            5,
-            6,
-            7,
-            8,
-            9,
-            10,
-            11,
-            12,
-            13,
-            14,
-            15,
-            16,
-            17,
-            18,
-            19,
-            20,
-            21,
-            22,
-            23,
-            24
-          ];
-
-        Future<void> notify() async {
-            String timezone = await AwesomeNotifications().getLocalTimeZoneIdentifier();
+          // int dropdownvalue = 1;
+          // List<int> _numbers = [
+          //   1,
+          //   2,
+          //   3,
+          //   4,
+          //   5,
+          //   6,
+          //   7,
+          //   8,
+          //   9,
+          //   10,
+          //   11,
+          //   12,
+          //   13,
+          //   14,
+          //   15,
+          //   16,
+          //   17,
+          //   18,
+          //   19,
+          //   20,
+          //   21,
+          //   22,
+          //   23,
+          //   24
+          // ];
+        TextEditingController titleFormController = TextEditingController();
+        TextEditingController subTitleFormController = TextEditingController();
+        Future<void> notify(int id, String text, String desc, String time/*, int interval*/) async {
+            // String timezone = await AwesomeNotifications().getLocalTimeZoneIdentifier();
             await AwesomeNotifications().createNotification(
               content: NotificationContent(
-                id: AwesomeNotifications.maxID + 1,
+                id: id,
                 channelKey: 'doc_app_reminder_key_1',
-                title: DateFormat.Hm().format(DateTime.now()).toString() +
-                    ' , у Вас плановый прием лекарств',
-                body: 'Вам необходимо принять Аналгин',
-                // bigPicture: 'https://protocoderspoint.com/wp-content/uploads/2021/05/Monitize-flutter-app-with-google-admob-min-741x486.png',
-                // bigPicture: '',
-                // notificationLayout: NotificationLayout.BigPicture
+                title: DateFormat.Hm().format(DateTime.now()).toString() + ', ' + text,
+                body: desc,
               ),
               schedule:
-                  NotificationInterval(interval: 2, timeZone: timezone, repeats: false),
-            );
+                  // NotificationInterval(interval: 1/*interval * 60 * 60*/, timeZone: timezone, repeats: true),
+                        NotificationCalendar.fromDate(date: DateTime.parse(DateTime.now().year.toString() + DateTime.now().month.toString() + DateTime.now().day.toString() + time + ':00'), repeats: true),
+            ).then((value) async{
+              if(value == true){
+                await Reminder().writeJson(id, text, desc, time/*, interval*/);
+              }
+            });
           }
           
           Future<void> selectTime(BuildContext context) async {
@@ -130,12 +160,13 @@ class _ReminderPageState extends State<ReminderPage> {
                         padding: const EdgeInsets.only(left: 30, right: 30),
                         child:
                         TextFormField(
+                          controller: titleFormController,
                           // cursorColor: Theme.of(context).cursorColor,
                           cursorColor: Colors.blue,
                           // initialValue: 'Input text',
                           maxLength: 20,
                           decoration: const InputDecoration(
-                            icon: Icon(Icons.medication_liquid),
+                            icon: Icon(Icons.title),
                             // labelText: 'Label text',
                             labelStyle: TextStyle(
                               color: Color(0xFF6200EE),
@@ -144,6 +175,36 @@ class _ReminderPageState extends State<ReminderPage> {
                             helperStyle: TextStyle(
                                 fontWeight: FontWeight.bold, fontSize: 15),
                             hintText: 'Введите название',
+                            hintStyle: TextStyle(
+                                fontWeight: FontWeight.bold, fontSize: 17.5),
+                            suffixIcon: Icon(
+                              Icons.check_circle,
+                            ),
+                            enabledBorder: UnderlineInputBorder(
+                              borderSide: BorderSide(color: Color(0xFF6200EE)),
+                            ),
+                          ),
+                        ),
+                      ),
+                      Padding(
+                        padding: const EdgeInsets.only(left: 30, right: 30),
+                        child:
+                        TextFormField(
+                          controller: subTitleFormController,
+                          // cursorColor: Theme.of(context).cursorColor,
+                          cursorColor: Colors.blue,
+                          // initialValue: 'Input text',
+                          maxLength: 20,
+                          decoration: const InputDecoration(
+                            icon: Icon(Icons.description),
+                            // labelText: 'Label text',
+                            labelStyle: TextStyle(
+                              color: Color(0xFF6200EE),
+                            ),
+                            // helperText: 'Helper text',
+                            helperStyle: TextStyle(
+                                fontWeight: FontWeight.bold, fontSize: 15),
+                            hintText: 'Описание уведомления',
                             hintStyle: TextStyle(
                                 fontWeight: FontWeight.bold, fontSize: 17.5),
                             suffixIcon: Icon(
@@ -190,48 +251,48 @@ class _ReminderPageState extends State<ReminderPage> {
                           ],
                         );
                       }),
-                      const SizedBox(
-                        height: 5,
-                      ),
-                      Row(
-                        mainAxisAlignment: MainAxisAlignment.center,
-                        children: [
-                          const Icon(Icons.av_timer_outlined),
-                          const Text(' Выберите интервал',
-                              style: TextStyle(
-                                  color: Colors.black,
-                                  fontWeight: FontWeight.bold,
-                                  fontSize: 20),),
-                          // const SizedBox(width: 15,),
-                          StatefulBuilder(builder:
-                              (BuildContext context, StateSetter setState) {
-                            return DropdownButton(
-                              value: dropdownvalue,
-                              style: const TextStyle(
-                                  color: Colors.blue,
-                                  fontWeight: FontWeight.bold,
-                                  fontSize: 20),
-                              alignment: AlignmentDirectional.centerEnd,
-                              dropdownColor: Colors.white,
-                              icon: const Icon(Icons.keyboard_arrow_down),
-                              items: _numbers.map((items) {
-                                return DropdownMenuItem(
-                                  value: items,
-                                  child: Text(items.toString()),
-                                  // onTap: (){
-                                  //   set
-                                  // },
-                                );
-                              }).toList(),
-                              onChanged: (int? newValue) {
-                                setState(() {
-                                  dropdownvalue = newValue!;
-                                });
-                              },
-                            );
-                          }),
-                        ],
-                      ),
+                      // const SizedBox(
+                      //   height: 5,
+                      // ),
+                      // Row(
+                      //   mainAxisAlignment: MainAxisAlignment.center,
+                      //   children: [
+                      //     const Icon(Icons.av_timer_outlined),
+                      //     const Text(' Выберите интервал',
+                      //         style: TextStyle(
+                      //             color: Colors.black,
+                      //             fontWeight: FontWeight.bold,
+                      //             fontSize: 20),),
+                      //     // const SizedBox(width: 15,),
+                      //     StatefulBuilder(builder:
+                      //         (BuildContext context, StateSetter setState) {
+                      //       return DropdownButton(
+                      //         value: dropdownvalue,
+                      //         style: const TextStyle(
+                      //             color: Colors.blue,
+                      //             fontWeight: FontWeight.bold,
+                      //             fontSize: 20),
+                      //         alignment: AlignmentDirectional.centerEnd,
+                      //         dropdownColor: Colors.white,
+                      //         icon: const Icon(Icons.keyboard_arrow_down),
+                      //         items: _numbers.map((items) {
+                      //           return DropdownMenuItem(
+                      //             value: items,
+                      //             child: Text(items.toString()),
+                      //             // onTap: (){
+                      //             //   set
+                      //             // },
+                      //           );
+                      //         }).toList(),
+                      //         onChanged: (int? newValue) {
+                      //           setState(() {
+                      //             dropdownvalue = newValue!;
+                      //           });
+                      //         },
+                      //       );
+                      //     }),
+                      //   ],
+                      // ),
                       const SizedBox(
                         height: 15,
                       ),
@@ -259,18 +320,31 @@ class _ReminderPageState extends State<ReminderPage> {
                                 textAlign: TextAlign.center,
                               )),
                               TextButton(
-                              onPressed: (){
+                              onPressed: () async{
+                                var jsonResult = await Reminder().readJson();
                                 // if(AwesomeNotifications.maxID > 5){
                                 //   inspect(AwesomeNotifications.maxID);
                                 //   inspect('Too much notifications');
                                 //   return;
                                 // }
-                                Timer.periodic(const Duration(minutes: 1), (timer) {
-                                  if (DateTime.now()== DateTime.parse("2022-04-23 17:59:00")){
-                                    timer.cancel();
-                                    notify();
-                                  }
-                                });
+                                // Timer.periodic(const Duration(minutes: 1), (timer) {
+                                //   if (DateTime.now()== DateTime.parse("2022-04-23 17:59:00")){
+                                //     timer.cancel();
+                                if(jsonResult.isNotEmpty && titleFormController.text.trim().isNotEmpty && subTitleFormController.text.trim().isNotEmpty && jsonResult['count'] < 5){
+                                  // await Reminder().writeJson(jsonResult['count'] + 1, titleFormController.text.trim(), subTitleFormController.text.trim())
+                                  // .then((value){setState(() {});});
+                                  // Navigator.pop(buildContext);
+                                  String notifyTime = (time.hour.toString() == '0' ? '00': time.hour.toString()) + ':' +(time.minute.toString().length < 2 ? '0' + time.minute.toString(): time.minute.toString());
+                                  notify(jsonResult['count'] + 1, titleFormController.text.trim(), subTitleFormController.text.trim(), notifyTime/*, dropdownvalue*/).then((value){
+                                    setState(() {});
+                                    Navigator.pop(buildContext);
+                                  });
+                                }else{
+                                  await _remindersLimitNotification();
+                                }
+                                    // notify(jsonResult['count'] + 1, titleFormController.text.trim(), subTitleFormController.text.trim(), time, dropdownvalue);
+                                //   }
+                                // });
                               },
                               style: ButtonStyle(
                                 backgroundColor:
@@ -304,7 +378,6 @@ class _ReminderPageState extends State<ReminderPage> {
 
   @override
   Widget build(BuildContext context) {
-    inspect(Reminder().readJson());
     return SafeArea(
       child: Scaffold(
         // backgroundColor: const Color.fromARGB(255, 0, 0, 0),
@@ -338,78 +411,155 @@ class _ReminderPageState extends State<ReminderPage> {
         body: Padding(
           padding: const EdgeInsets.only(top: 10, left: 10, right: 10),
           child: Center(
-            child: Column(
-              children: [
-                // FutureBuilder(
-                //   future: Reminder().readJson(),
-                //   builder: (BuildContext context,
-                //       AsyncSnapshot snapshot) {
-                //         // inspect(snapshot.data);
-                //     if (snapshot.hasData) {
-                //     return ListView.separated(
-                //       scrollDirection: Axis.vertical,
-                //       shrinkWrap: true,
-                //       separatorBuilder: (BuildContext context, int index) =>
-                //           const SizedBox(),
-                //       itemCount: snapshot.data['count'],
-                //       itemBuilder: (context, index) {
-                //         var _data = snapshot.data[index.toString()];
-                //         return Card(
-                //           color: const Color.fromARGB(255, 85, 0, 255),
-                //           child: ListTile(
-                //               title: Text(_data['title'],
-                //                   style: const TextStyle(
-                //                       fontWeight: FontWeight.bold, color: Colors.white)),
-                //               subtitle: Text(_data['subtitle'],
-                //                   style: const TextStyle(
-                //                       fontWeight: FontWeight.bold, color: Colors.white)),
-                //               leading: const Icon(Icons.notifications_active, color: Colors.white, size: 40),
-                //               // leading: CircleAvatar(
-                //               //     backgroundImage: AssetImage(
-                //               //         'assets/images/reminder.png')),
-                //               trailing: IconButton(
-                //                 onPressed: ((){
-                //                   // Reminder().deleteFromJson(1);
-                //                   // AwesomeNotifications().cancelSchedule(_data['id']).then((value){
+            child: 
+                FutureBuilder(
+                  future: Reminder().readJson(),
+                  builder: (BuildContext context,
+                      AsyncSnapshot snapshot) {
+                    // if (reminderCount == null || snapshot.connectionState == ConnectionState.waiting) {
+                    //   return const Text('Загрузка данных', style: TextStyle(fontWeight: FontWeight.bold, fontSize: 20), textAlign: TextAlign.center,);
+                    // }
+                    if (snapshot.hasData) {
+                      if(snapshot.data['count'] > 0){
+                        return Column(
+                        children: [
+                      ListView.separated(
+                          scrollDirection: Axis.vertical,
+                          shrinkWrap: true,
+                          separatorBuilder: (BuildContext context, int index) =>
+                              const SizedBox(),
+                          itemCount: snapshot.data['count'],
+                          itemBuilder: (context, index) {
+                            var _data = snapshot.data[index.toString()];
+                            return Card(
+                              color: const Color.fromARGB(255, 85, 0, 255),
+                              child: ListTile(
+                                  title: Text(_data['text'],
+                                  maxLines: 1,
+                                  overflow: TextOverflow.ellipsis,
+                                  softWrap: false,
+                                      style: const TextStyle(
+                                          fontWeight: FontWeight.bold, color: Colors.white)),
+                                  subtitle: Text(_data['desc'],
+                                      maxLines: 1,
+                                      overflow: TextOverflow.ellipsis,
+                                      softWrap: false,
+                                      style: const TextStyle(
+                                          fontWeight: FontWeight.bold, color: Colors.white)),
+                                  leading: const Icon(Icons.notifications_active, color: Colors.white, size: 40),
+                                  // leading: CircleAvatar(
+                                  //     backgroundImage: AssetImage(
+                                  //         'assets/images/reminder.png')),
+                                  trailing: IconButton(
+                                    onPressed: ((){
+                                      Reminder().deleteFromJson(index)
+                                      .then((value){
+                                        setState((){
+                                          AwesomeNotifications().cancelSchedule(index);
+                                          AwesomeNotifications().dismiss(index);
+                                        });
+                                      });
+                                      // AwesomeNotifications().cancelSchedule(_data['id']).then((value){
 
-                //                   // });
-                //                 }), 
-                //                 // onPressed: null, 
-                //                 icon: const Icon(Icons.close, color: Colors.white, size: 30,)),
-                //               ));
-                //     });
-                //     }else{
-                //       return Text('test');
-                //     }
-                //     }
-                //   ),
-                  const SizedBox(height: 10,),
-                  TextButton(
-                    onPressed: () {
-                      _createReminder();
-                      // Reminder().writeJson();
-                    },
-                    style: ButtonStyle(
-                    backgroundColor:
-                        MaterialStateProperty.all(Colors.blue),
-                    shape: MaterialStateProperty.resolveWith<
-                        OutlinedBorder>((_) {
-                      return RoundedRectangleBorder(
-                        borderRadius: BorderRadius.circular(10),
-                      );
-                    }),
+                                      // });
+                                    }), 
+                                    // onPressed: null, 
+                                    icon: const Icon(Icons.close, color: Colors.white, size: 30,)),
+                                  ));
+                                }),
+                                const SizedBox(height: 10,),
+                            TextButton(
+                              onPressed: () {
+                                _createReminder();
+                                // Reminder().deleteFromJson(2);
+                              },
+                              style: ButtonStyle(
+                              backgroundColor:
+                                  MaterialStateProperty.all(Colors.blue),
+                              shape: MaterialStateProperty.resolveWith<
+                                  OutlinedBorder>((_) {
+                                return RoundedRectangleBorder(
+                                  borderRadius: BorderRadius.circular(10),
+                                );
+                              }),
+                            ),
+                            child: const Text(
+                                  '+ Добавить напоминание',
+                                  style: TextStyle( 
+                                      color: Colors.white,
+                                      fontSize: 19,
+                                      fontWeight: FontWeight.bold),
+                                  textAlign: TextAlign.center,
+                                ),
+                          ),
+                              ],
+                            );
+                      }else{
+                        return Column(
+                          mainAxisAlignment: MainAxisAlignment.center,
+                          children: <Widget>[
+                            const Text('У вас нет активный напоминаний', style: TextStyle(fontWeight: FontWeight.bold, fontSize: 20), textAlign: TextAlign.center,),
+                            const SizedBox(height: 10,),
+                              TextButton(
+                                onPressed: () {
+                                  _createReminder();
+                                  // Reminder().deleteFromJson(2);
+                                },
+                                style: ButtonStyle(
+                                backgroundColor:
+                                    MaterialStateProperty.all(Colors.blue),
+                                shape: MaterialStateProperty.resolveWith<
+                                    OutlinedBorder>((_) {
+                                  return RoundedRectangleBorder(
+                                    borderRadius: BorderRadius.circular(10),
+                                  );
+                                }),
+                              ),
+                              child: const Text(
+                                    '+ Добавить напоминание',
+                                    style: TextStyle(
+                                        color: Colors.white,
+                                        fontSize: 19,
+                                        fontWeight: FontWeight.bold),
+                                    textAlign: TextAlign.center,
+                                  ),
+                            ),
+                        ],);
+                      }
+                    }else{
+                      return Column(
+                          mainAxisAlignment: MainAxisAlignment.center,
+                          children: <Widget>[
+                            const Text('У вас нет активный напоминаний', style: TextStyle(fontWeight: FontWeight.bold, fontSize: 20), textAlign: TextAlign.center,),
+                            const SizedBox(height: 10,),
+                            TextButton(
+                              onPressed: () {
+                                _createReminder();
+                                // Reminder().deleteFromJson(2);
+                              },
+                              style: ButtonStyle(
+                              backgroundColor:
+                                  MaterialStateProperty.all(Colors.blue),
+                              shape: MaterialStateProperty.resolveWith<
+                                  OutlinedBorder>((_) {
+                                return RoundedRectangleBorder(
+                                  borderRadius: BorderRadius.circular(10),
+                                );
+                              }),
+                            ),
+                            child: const Text(
+                                  '+ Добавить напоминание',
+                                  style: TextStyle(
+                                      color: Colors.white,
+                                      fontSize: 19,
+                                      fontWeight: FontWeight.bold),
+                                  textAlign: TextAlign.center,
+                                ),
+                          ),
+                        ],);
+                    }
+                    }
                   ),
-                  child: const Text(
-                        '+ Добавить напоминание',
-                        style: TextStyle(
-                            color: Colors.white,
-                            fontSize: 19,
-                            fontWeight: FontWeight.bold),
-                        textAlign: TextAlign.center,
-                      ),
-                ),
-              ],
-            ),
           ),
         ),
       ),

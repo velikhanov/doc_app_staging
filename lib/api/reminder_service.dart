@@ -8,7 +8,7 @@ import 'package:path_provider/path_provider.dart';
 class Reminder{
     Future<String> get _localPath async {
       final directory = await getApplicationDocumentsDirectory();
-      inspect(directory.path);
+      
       return directory.path;
     }
 
@@ -17,24 +17,56 @@ class Reminder{
       return File('$path/reminder.json');
     }
 
-    Future<File> writeJson() async {
+    Future<File> writeJson(int id, String text, String desc, String time/*, int interval*/) async {
       final file = await _localFile;
-      final String response = await rootBundle.loadString('assets/reminder.json');
+      // final String response = await rootBundle.loadString('assets/reminder.json');
+      final decodedJson = await json.decode(await file.readAsString());
+      decodedJson[(id > 0 ? id - 1 : 0).toString()] = {'id': id, 'text': text, 'desc': desc, 'time': time/*, 'interval': interval*/};
+      // decodedJson[(id > 0 ? id - 1 : 0).toString()] = {'text': text};
+      // decodedJson[(id > 0 ? id - 1 : 0).toString()] = {'desc': desc};
+      await decodedJson.remove('count');
+      decodedJson['count'] = id;
+      
       // Write the file
-      return file.writeAsString(response);
+      return await file.writeAsString(json.encode(decodedJson));
     }
 
-    Future<int> readJson() async {
+    Future<File> deleteFromJson(int id) async {
+      final file = await _localFile;
+      final decodedJson = await json.decode(await file.readAsString());
+      await decodedJson.remove(id.toString());
+      if(id != 0){
+        for (int i = id; i < decodedJson['count'] - 1; i++) {
+          decodedJson[i.toString()] = decodedJson[(i + 1).toString()];
+          decodedJson[i.toString()]['id'] = i + 1;
+        }
+      }
+      if(id != 0){
+        int count = decodedJson['count'] - 1;
+        await decodedJson.remove('count');
+        decodedJson['count'] = count;
+      }else{
+        await decodedJson.remove('count');
+        decodedJson['count'] = 0;
+      }
+
+      // Write the file
+      return await file.writeAsString(json.encode(decodedJson));
+      // return file;
+    }
+
+    Future<Map> readJson() async {
       try {
         final file = await _localFile;
 
         // Read the file
-        final contents = await file.readAsString();
+        final jsonResponce = await json.decode(await file.readAsString());
 
-        return await json.decode(contents);
+      return await jsonResponce;
+        // return await json.decode(contents);
       } catch (e) {
         // If encountering an error, return 0
-        return 0;
+        return {};
       }
     }
 

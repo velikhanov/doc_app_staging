@@ -1,3 +1,4 @@
+import 'package:doc_app/api/reminder_service.dart';
 import 'package:doc_app/pages/reminder.dart';
 import 'package:doc_app/widgets/home_tabs.dart';
 import 'package:doc_app/widgets/top_bar.dart';
@@ -39,12 +40,17 @@ class _HomePageState extends State<HomePage> {
             // backgroundColor: const Color(0xff03dac6),
             backgroundColor: Colors.black,
             foregroundColor: Colors.white,
-            onPressed: (() => Navigator.push(
+            onPressed: (() {
+              Navigator.push(
                   context,
                   // MaterialPageRoute(builder: (context) => const ChatPage(),
                   MaterialPageRoute(
                     builder: (context) => const ReminderPage(),
-                  ))),
+                  ));
+                  // Reminder().writeJson();
+                  // Reminder().deleteFromJson(0);
+              }
+            ),
             icon: const Icon(Icons.add, size: 20,),
             label: const Text('Напоминания', style: TextStyle(fontWeight: FontWeight.bold, fontSize: 15)),
           ),),
