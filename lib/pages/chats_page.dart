@@ -10,27 +10,13 @@ class ChatsPage extends StatelessWidget {
   Widget build(BuildContext context) {
     var _chats = getChats('all_chats', FirebaseAuth.instance.currentUser!.uid);
 
-    return
-        // Container(
-        //   color: Colors.white,
-        //   child: DefaultTextStyle(
-        //     style: const TextStyle(
-        //         color: Colors.black, decoration: TextDecoration.none),
-        //     child:
-        Scaffold(
-      // backgroundColor: Colors.white,
+    return Scaffold(
       appBar: AppBar(
         elevation: 8,
         leading: IconButton(
           icon: const Icon(Icons.arrow_back_ios),
           color: Colors.white,
           onPressed: () => Navigator.pop(context),
-          // () => Navigator.push(
-          //   context,
-          //   MaterialPageRoute(
-          //     builder: (_) => const HomePage(),
-          //   ),
-          // ),
         ),
         title: const Text(
           'Все чаты',
@@ -38,16 +24,8 @@ class ChatsPage extends StatelessWidget {
             color: Colors.white,
           ),
         ),
-        // actions: <Widget>[
-        //   IconButton(
-        //     icon: const Icon(Icons.search),
-        //     color: Colors.white,
-        //     onPressed: () {},
-        //   ),
-        // ],
       ),
       body: FutureBuilder(
-          // future: _chatMessages,
           future: _chats,
           builder: (BuildContext context, AsyncSnapshot snapshot) {
             if (snapshot.hasError) {
@@ -95,7 +73,6 @@ class ChatsPage extends StatelessWidget {
                 return ListView.builder(
                   itemCount: snapshot.data.length,
                   itemBuilder: (BuildContext context, int index) {
-                    // final Message chat = chats[index];
                     var chat = snapshot.data[index];
                     return GestureDetector(
                       onTap: () => Navigator.push(
@@ -129,7 +106,6 @@ class ChatsPage extends StatelessWidget {
                                         width: 2,
                                         color: Theme.of(context).primaryColor,
                                       ),
-                                      // shape: BoxShape.circle,
                                       boxShadow: [
                                         BoxShadow(
                                           color: Colors.grey.withOpacity(0.5),
@@ -150,7 +126,6 @@ class ChatsPage extends StatelessWidget {
                                     ),
                               child: const CircleAvatar(
                                 radius: 30,
-                                // backgroundImage: AssetImage(chat.sender.imageUrl),
                                 backgroundImage:
                                     AssetImage('assets/images/home_img.png'),
                               ),
@@ -200,7 +175,6 @@ class ChatsPage extends StatelessWidget {
                                         chat['timestamp'],
                                         style: const TextStyle(
                                           fontSize: 11,
-                                          // fontWeight: FontWeight.w300,
                                           fontWeight: FontWeight.bold,
                                           color: Colors.black54,
                                         ),
@@ -212,32 +186,50 @@ class ChatsPage extends StatelessWidget {
                                   ),
                                   Container(
                                     alignment: Alignment.topLeft,
-                                    child: 
-                                    chat['attachment'].toString().isNotEmpty ?
-                                      chat['attachment'].toString().contains('.png')
-                                      || chat['attachment'].toString().contains('.jpg')
-                                      || chat['attachment'].toString().contains('.jpeg')
-                                      ? Row(
-                                        children: const [
-                                          Text('Приложено изображение ', style: TextStyle(color: Colors.grey,)),
-                                          Icon(Icons.image, size: 17, color: Colors.grey)
-                                        ],
-                                      ) : Row(
-                                        children: const [
-                                          Text('Приложен документ ', style: TextStyle(color: Colors.grey,)),
-                                          Icon(Icons.picture_as_pdf, size: 17, color: Colors.grey)
-                                        ],
-                                      )
-                                    : Text(
-                                      chat['message'],
-                                      style: const TextStyle(
-                                        fontSize: 13,
-                                        fontWeight: FontWeight.bold,
-                                        color: Colors.black54,
-                                      ),
-                                      overflow: TextOverflow.ellipsis,
-                                      maxLines: 2,
-                                    ),
+                                    child: chat['attachment']
+                                            .toString()
+                                            .isNotEmpty
+                                        ? chat['attachment']
+                                                    .toString()
+                                                    .contains('.png') ||
+                                                chat['attachment']
+                                                    .toString()
+                                                    .contains('.jpg') ||
+                                                chat['attachment']
+                                                    .toString()
+                                                    .contains('.jpeg')
+                                            ? Row(
+                                                children: const [
+                                                  Text('Приложено изображение ',
+                                                      style: TextStyle(
+                                                        color: Colors.grey,
+                                                      )),
+                                                  Icon(Icons.image,
+                                                      size: 17,
+                                                      color: Colors.grey)
+                                                ],
+                                              )
+                                            : Row(
+                                                children: const [
+                                                  Text('Приложен документ ',
+                                                      style: TextStyle(
+                                                        color: Colors.grey,
+                                                      )),
+                                                  Icon(Icons.picture_as_pdf,
+                                                      size: 17,
+                                                      color: Colors.grey)
+                                                ],
+                                              )
+                                        : Text(
+                                            chat['message'],
+                                            style: const TextStyle(
+                                              fontSize: 13,
+                                              fontWeight: FontWeight.bold,
+                                              color: Colors.black54,
+                                            ),
+                                            overflow: TextOverflow.ellipsis,
+                                            maxLines: 2,
+                                          ),
                                   ),
                                   const SizedBox(
                                     height: 5,

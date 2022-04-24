@@ -1,5 +1,3 @@
-import 'dart:developer';
-
 import 'package:doc_app/pages/calendar_page.dart';
 import 'package:doc_app/pages/chats_page.dart';
 import 'package:doc_app/pages/doc_page.dart';
@@ -100,12 +98,8 @@ class _HomeTabsState extends State<HomeTabs> with TickerProviderStateMixin {
             physics: const NeverScrollableScrollPhysics(),
             children: <Widget>[
               /////
-              // StreamBuilder<QuerySnapshot>(
               FutureBuilder(
-                // stream: _category,
-                // builder: (BuildContext context, AsyncSnapshot<QuerySnapshot> snapshot) {
                 future: _category,
-                // builder: (_, snapshot) {
                 builder: (BuildContext context, AsyncSnapshot snapshot) {
                   if (snapshot.hasError) {
                     return Column(
@@ -143,7 +137,6 @@ class _HomeTabsState extends State<HomeTabs> with TickerProviderStateMixin {
                     );
                   }
                   if (snapshot.hasData) {
-                    // var data = snapshot.data!.data();
                       return Column(
                         mainAxisAlignment: snapshot.data.docs.isNotEmpty ? MainAxisAlignment.start : MainAxisAlignment.center,
                         children: <Widget>[
@@ -163,7 +156,6 @@ class _HomeTabsState extends State<HomeTabs> with TickerProviderStateMixin {
                             child: Column(
                               mainAxisAlignment: MainAxisAlignment.spaceAround,
                               crossAxisAlignment: CrossAxisAlignment.center,
-                              // children: snapshot.data!.data()!.docs
                               children: snapshot.data!.docs
                                   .map<Widget>((DocumentSnapshot document) {
                                 Map<String, dynamic> data =
@@ -276,20 +268,13 @@ class _HomeTabsState extends State<HomeTabs> with TickerProviderStateMixin {
                                                                       .w400))
                                                       : const SizedBox(height: 0),
                                               const SizedBox(height: 4),
-                                              // Text(data['first_name']! + ' ' + data['second_name']!, style: const TextStyle(color: Colors.white70)),
-                                              // Text(data['category'], style: const TextStyle(color: Colors.white70)),
                                             ],
                                           ),
                                           const Spacer(),
                                           CircleAvatar(
-                                            // backgroundColor: Colors.white,
-                                            // ignore: todo
-                                            // TODO: to check if image file exists to avoid problem with image loading when image name is incorrect in DB
                                             backgroundImage: data['img'] != null && data['img'] != ""
                                             ? AssetImage('assets/images/' + data['img'])
                                             : const AssetImage('assets/images/home_img.png'),
-                                            // backgroundImage: AssetImage(
-                                            //     'assets/images/home_img.png'),
                                           ),
                                         ],
                                       ),
@@ -374,31 +359,22 @@ class _HomeTabsState extends State<HomeTabs> with TickerProviderStateMixin {
                           itemCount: snapshot.data.size,
                           itemBuilder: (context, index) {
                             var _data = snapshot.data!.docs[index].data();
-                            // _data = _data.data();
-                            // for (DocumentSnapshot document
-                            //     in snapshot.data!.docs) {
-                            //   Map<String, dynamic> _data =
-                            //       snapshot.data!.docs as Map<String, dynamic>;
                               return Card(
                                 color: const Color.fromARGB(255, 0, 115, 153),
                                 child: ListTile(
                                     title: Text(((_data['role'] == 'p') ? (_data['category'] + ' - ' + _data['name']) : _data['name']),
                                         style: const TextStyle(
                                             fontWeight: FontWeight.bold)),
-                                    // subtitle: Text(_data['date'],
                                     subtitle: Text(DateFormat('yyyy-MM-dd HH:mm').format(DateTime.parse(DateTime.fromMillisecondsSinceEpoch(_data['date']).toString())).toString(),
                                         style: const TextStyle(
                                             fontWeight: FontWeight.bold)),
                                     leading: const CircleAvatar(
                                         backgroundImage: AssetImage(
                                             'assets/images/checklist.png')),
-                                    // trailing: Icon(Icons.access_time_filled, color: Colors.black,)));
                                     trailing: const Icon(
                                       Icons.calendar_month,
                                       color: Colors.black,
                                     )));
-                            // }
-                            // }
                           });
                       }else{
                         return Column(

@@ -1,5 +1,3 @@
-import 'dart:developer';
-
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 
@@ -72,45 +70,27 @@ getPlannedVisits(String _currentUser) async {
 
   for (QueryDocumentSnapshot<Map<String, dynamic>> element in _userRole.docs) {
     if (element.data()['role'] == 'p') {
-        // List _result = [];
-         QuerySnapshot<Map<String, dynamic>> _snapshot = await FirebaseFirestore.instance
+      QuerySnapshot<Map<String, dynamic>> _snapshot = await FirebaseFirestore
+          .instance
           .collection('planned_visits/' + _currentUser + '/' + _currentUser)
-          // .where('user_uid', isEqualTo: _currentUser)
-          // .where('date', isGreaterThan: '')
           .where('date', isGreaterThan: DateTime.now().millisecondsSinceEpoch)
-          // .orderBy('date')
           .get();
-          // for (var item in _snapshot.docs){
-          //   if(item.data()['date'] > DateTime.now().millisecondsSinceEpoch){
-          //     _result.add(item);
-          //   }
-          // }
       return _snapshot;
-    } else if(element.data()['role'] == 'd') {
-      // List _result = [];
-      QuerySnapshot<Map<String, dynamic>> _snapshot = await FirebaseFirestore.instance
+    } else if (element.data()['role'] == 'd') {
+      QuerySnapshot<Map<String, dynamic>> _snapshot = await FirebaseFirestore
+          .instance
           .collection('appointments/' + _currentUser + '/' + _currentUser)
-          // .where('doc_uid', isEqualTo: _currentUser)
-          // .where('date', isGreaterThan: '')
           .where('date', isGreaterThan: DateTime.now().millisecondsSinceEpoch)
-          // .orderBy('date')
           .get();
-          // for (var item in _snapshot.docs){
-          //   if(item.data()['date'] > DateTime.now().millisecondsSinceEpoch){
-          //     _result.add(item);
-          //   }
-          // }
       return _snapshot;
     }
   }
 }
 
 // Gets times for booking
-getTimesForBooking(){
-  Stream<QuerySnapshot<Map<String, dynamic>>> _snapshot = FirebaseFirestore
-      .instance
-      .collection('test')
-      .snapshots();
+getTimesForBooking() {
+  Stream<QuerySnapshot<Map<String, dynamic>>> _snapshot =
+      FirebaseFirestore.instance.collection('test').snapshots();
 
   return _snapshot;
 }
@@ -187,7 +167,7 @@ getChats(String _collection, String uid) async {
 }
 
 // Return related documentation that was used by doctors or patients
-getDocuments(String uid, bool isFirstPage, {String? email}) async{
+getDocuments(String uid, bool isFirstPage, {String? email}) async {
   QuerySnapshot<Map<String, dynamic>> _userRole = await FirebaseFirestore
       .instance
       .collection('roles')
@@ -210,18 +190,17 @@ getDocuments(String uid, bool isFirstPage, {String? email}) async{
             .where('attachment', isNotEqualTo: "")
             .orderBy('attachment', descending: false)
             .get();
-            if(isFirstPage == true){
-              _result.add(_snapshot.docs[0].data()['member_2_email']);
-            }else{
-              for (var _res in _snapshot.docs) {
-                if(_res.data()['member_2_email'] == email){
-                  _result.add(_res);
-                }
-              }
+        if (isFirstPage == true) {
+          _result.add(_snapshot.docs[0].data()['member_2_email']);
+        } else {
+          for (var _res in _snapshot.docs) {
+            if (_res.data()['member_2_email'] == email) {
+              _result.add(_res);
             }
+          }
         }
-        return _result;
-
+      }
+      return _result;
     } else if (element.data()['role'] == 'd') {
       List _result = [];
       QuerySnapshot<Map<String, dynamic>> _getMemberUid =
@@ -239,16 +218,15 @@ getDocuments(String uid, bool isFirstPage, {String? email}) async{
             .orderBy('attachment', descending: false)
             .get();
 
-            if(isFirstPage == true){
-              _result.add(_snapshot.docs[0].data()['member_1_email']);
-            }else{
-              for (var _res in _snapshot.docs) {
-                if(_res.data()['member_1_email'] == email){
-                  _result.add(_res);
-                }
-              }
+        if (isFirstPage == true) {
+          _result.add(_snapshot.docs[0].data()['member_1_email']);
+        } else {
+          for (var _res in _snapshot.docs) {
+            if (_res.data()['member_1_email'] == email) {
+              _result.add(_res);
             }
-  
+          }
+        }
       }
       return _result;
     }

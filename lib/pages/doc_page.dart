@@ -1,5 +1,4 @@
 import 'dart:async';
-
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:doc_app/api/get_data.dart';
 import 'package:doc_app/pages/chat_screen.dart';
@@ -59,39 +58,28 @@ class DocPage extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    // var _refresh = StatefulBuilder(builder:
-    //   (BuildContext context, StateSetter setState) {
-    //     setState(() {});
-    //     return const SizedBox(width: 0, height: 0);
-    // });
-    // FutureOr _refresh(){
-    //   setState(() {});
-    // }
-    showAlertDialog(BuildContext context, String message, bool isSuccess/*, {bool isDocPage = false}*/) async{
+    showAlertDialog(
+        BuildContext context, String message, bool isSuccess) async {
       // set up the button
       Widget okButton = TextButton(
         child: const Text('Закрыть',
             style: TextStyle(fontSize: 20, fontWeight: FontWeight.bold),
             textAlign: TextAlign.center),
         onPressed: () {
-          if (isSuccess == true/* && isDocPage == true*/) {
+          if (isSuccess == true) {
             Navigator.push(
                 context,
                 MaterialPageRoute(
                   builder: (context) => DocPage(_collection, _id),
                 ));
-          // } else if(isSuccess == true && isDocPage == false){
-          //   Navigator.pop(context);
-          }else{
+          } else {
             Navigator.of(context).pop();
-            // _showAvailableTime(docName, docCategory, docUid, userUid);
           }
         },
       );
 
       // set up the AlertDialog
       AlertDialog alert = AlertDialog(
-        // title: Text("My title"),
         content: Text(message,
             style: const TextStyle(fontSize: 20, fontWeight: FontWeight.bold),
             textAlign: TextAlign.center),
@@ -125,8 +113,7 @@ class DocPage extends StatelessWidget {
           DateTime.now().hour + 2,
           // DateTime.now().hour,
           DateTime.now().minute,
-          DateTime.now().second
-          );
+          DateTime.now().second);
 
       var tomorrowDate = DateFormat('yyyy-MM-dd hh:mm:ss').format(DateTime(
           DateTime.now().year,
@@ -161,18 +148,20 @@ class DocPage extends StatelessWidget {
           (counter) => DateTime.parse(dayAfterTomorrowDate)
               .add(Duration(hours: counter))
               .toString());
-      
-      tempItemsToday.removeWhere((today) => DateTime.parse(today).millisecondsSinceEpoch < todaysDateCheck.millisecondsSinceEpoch);
-      
+
+      tempItemsToday.removeWhere((today) =>
+          DateTime.parse(today).millisecondsSinceEpoch <
+          todaysDateCheck.millisecondsSinceEpoch);
+
       List<String> itemsToday = [];
-      if(tempItemsToday.isNotEmpty){
+      if (tempItemsToday.isNotEmpty) {
         for (var today in tempItemsToday) {
           itemsToday.add(DateFormat('yyyy-MM-dd HH:mm')
               .format(DateTime.parse(today))
               .toString());
         }
       }
-        
+
       List<String> itemsTomorrow = [];
       for (var tomorrow in tempItemsTomorrow) {
         itemsTomorrow.add(DateFormat('yyyy-MM-dd HH:mm')
@@ -191,61 +180,28 @@ class DocPage extends StatelessWidget {
       // Booked times
       await FirebaseFirestore.instance
           .collection('planned_visits/' + userUid + '/' + userUid)
-          // .where('date', isGreaterThan: DateFormat('yyyy-MM-dd HH:mm').format(DateTime.parse(DateTime.now().toString())).toString())
-          // .where('date', isGreaterThan: '')
           .where('date', isGreaterThan: DateTime.now().millisecondsSinceEpoch)
-          // .orderBy('date')
           .get()
           .then((element) {
         for (var item in element.docs) {
-          itemsToday.removeWhere((element) => element.contains(DateFormat('yyyy-MM-dd HH:mm')
-                .format(DateTime.parse(
-                    DateTime.fromMillisecondsSinceEpoch(item.data()['date'])
-                        .toString()))
-                .toString()));
-          itemsTomorrow.removeWhere((element) => element.contains(DateFormat('yyyy-MM-dd HH:mm')
-                .format(DateTime.parse(
-                    DateTime.fromMillisecondsSinceEpoch(item.data()['date'])
-                        .toString()))
-                .toString()));
-          itemsDayAfterTomorrow.removeWhere((element) => element.contains(DateFormat('yyyy-MM-dd HH:mm')
-                .format(DateTime.parse(
-                    DateTime.fromMillisecondsSinceEpoch(item.data()['date'])
-                        .toString()))
-                .toString()));
-          // if (itemsToday.contains(DateFormat('yyyy-MM-dd HH:mm')
-          //     .format(DateTime.parse(
-          //         DateTime.fromMillisecondsSinceEpoch(item.data()['date'])
-          //             .toString()))
-          //     .toString())) {
-          //   itemsToday.remove(DateFormat('yyyy-MM-dd HH:mm')
-          //       .format(DateTime.parse(
-          //           DateTime.fromMillisecondsSinceEpoch(item.data()['date'])
-          //               .toString()))
-          //       .toString());
-          // }
-          // if (itemsTomorrow.contains(DateFormat('yyyy-MM-dd HH:mm')
-          //     .format(DateTime.parse(
-          //         DateTime.fromMillisecondsSinceEpoch(item.data()['date'])
-          //             .toString()))
-          //     .toString())) {
-          //   itemsTomorrow.remove(DateFormat('yyyy-MM-dd HH:mm')
-          //       .format(DateTime.parse(
-          //           DateTime.fromMillisecondsSinceEpoch(item.data()['date'])
-          //               .toString()))
-          //       .toString());
-          // }
-          // if (itemsDayAfterTomorrow.contains(DateFormat('yyyy-MM-dd HH:mm')
-          //     .format(DateTime.parse(
-          //         DateTime.fromMillisecondsSinceEpoch(item.data()['date'])
-          //             .toString()))
-          //     .toString())) {
-          //   itemsDayAfterTomorrow.remove(DateFormat('yyyy-MM-dd HH:mm')
-          //       .format(DateTime.parse(
-          //           DateTime.fromMillisecondsSinceEpoch(item.data()['date'])
-          //               .toString()))
-          //       .toString());
-          // }
+          itemsToday.removeWhere((element) => element.contains(
+              DateFormat('yyyy-MM-dd HH:mm')
+                  .format(DateTime.parse(
+                      DateTime.fromMillisecondsSinceEpoch(item.data()['date'])
+                          .toString()))
+                  .toString()));
+          itemsTomorrow.removeWhere((element) => element.contains(
+              DateFormat('yyyy-MM-dd HH:mm')
+                  .format(DateTime.parse(
+                      DateTime.fromMillisecondsSinceEpoch(item.data()['date'])
+                          .toString()))
+                  .toString()));
+          itemsDayAfterTomorrow.removeWhere((element) => element.contains(
+              DateFormat('yyyy-MM-dd HH:mm')
+                  .format(DateTime.parse(
+                      DateTime.fromMillisecondsSinceEpoch(item.data()['date'])
+                          .toString()))
+                  .toString()));
         }
       }).then((v) => showGeneralDialog(
               context: context,
@@ -293,13 +249,10 @@ class DocPage extends StatelessWidget {
                           child: StatefulBuilder(builder:
                               (BuildContext context, StateSetter setState) {
                             return Row(
-                              // mainAxisAlignment: MainAxisAlignment.spaceAround,
                               children: <Widget>[
                                 itemsToday.isNotEmpty
                                     ? Expanded(
                                         child: ListView.builder(
-                                          // reverse: true,
-                                          // padding: const EdgeInsets.all(20),
                                           itemCount: itemsToday.length,
                                           itemBuilder: (BuildContext context,
                                               int index) {
@@ -329,8 +282,8 @@ class DocPage extends StatelessWidget {
                                                           TextDecoration.none,
                                                       fontWeight:
                                                           FontWeight.bold,
-                                                      overflow: TextOverflow
-                                                          .fade) /*, textAlign: TextAlign.center*/),
+                                                      overflow:
+                                                          TextOverflow.fade)),
                                               leading: Theme(
                                                 data:
                                                     Theme.of(context).copyWith(
@@ -383,8 +336,6 @@ class DocPage extends StatelessWidget {
                                 itemsTomorrow.isNotEmpty
                                     ? Expanded(
                                         child: ListView.builder(
-                                          // reverse: true,
-                                          // padding: const EdgeInsets.all(20),
                                           itemCount: itemsTomorrow.length,
                                           itemBuilder: (BuildContext context,
                                               int index) {
@@ -425,7 +376,7 @@ class DocPage extends StatelessWidget {
                                                               FontWeight.bold,
                                                           color: Colors.white,
                                                           overflow: TextOverflow
-                                                              .fade) /*, textAlign: TextAlign.center*/),
+                                                              .fade)),
                                               leading: Theme(
                                                 data:
                                                     Theme.of(context).copyWith(
@@ -479,13 +430,10 @@ class DocPage extends StatelessWidget {
                                 itemsDayAfterTomorrow.isNotEmpty
                                     ? Expanded(
                                         child: ListView.builder(
-                                          // reverse: true,
-                                          // padding: const EdgeInsets.all(20),
                                           itemCount:
                                               itemsDayAfterTomorrow.length,
                                           itemBuilder: (BuildContext context,
                                               int index) {
-                                            // String selectedRadio = 'Test';
                                             return ListTile(
                                               horizontalTitleGap: 0,
                                               title: Text(
@@ -511,8 +459,8 @@ class DocPage extends StatelessWidget {
                                                       fontWeight:
                                                           FontWeight.bold,
                                                       color: Colors.white,
-                                                      overflow: TextOverflow
-                                                          .fade) /*, textAlign: TextAlign.center*/),
+                                                      overflow:
+                                                          TextOverflow.fade)),
                                               leading: Theme(
                                                 data:
                                                     Theme.of(context).copyWith(
@@ -563,7 +511,6 @@ class DocPage extends StatelessWidget {
                                             fontWeight: FontWeight.bold),
                                         textAlign: TextAlign.center,
                                       )),
-                                // Text(DateFormat.Hm().format(DateTime.parse(itemsDayAfterTomorrow[index])).toString(), style: const TextStyle(fontSize: 15, decoration: TextDecoration.none, overflow: TextOverflow.fade), textAlign: TextAlign.center,
                               ],
                             );
                           }),
@@ -571,16 +518,10 @@ class DocPage extends StatelessWidget {
                         SizedBox(
                           width: MediaQuery.of(context).size.width,
                           height: MediaQuery.of(context).size.height * 0.1,
-                          child:
-                              // StatefulBuilder(builder:
-                              //     (BuildContext context, StateSetter setState) {
-                              // return
-                              Row(
+                          child: Row(
                             mainAxisAlignment: MainAxisAlignment.spaceAround,
-                            // crossAxisAlignment: CrossAxisAlignment.end,
                             children: [
                               TextButton(
-                                // onPressed: (() => Navigator.pop(context)),
                                 onPressed: (() => Navigator.push(
                                     context,
                                     MaterialPageRoute(
@@ -600,21 +541,25 @@ class DocPage extends StatelessWidget {
                                           userUid +
                                           '/' +
                                           userUid)
-                                      // .where('date', isGreaterThan: '')
                                       .where('date',
                                           isEqualTo:
                                               DateTime.parse(_result + ':00')
                                                   .millisecondsSinceEpoch)
-                                      // .orderBy('date')
                                       .get()
                                       .then((alreadyExists) async {
-                                    if (alreadyExists.size > 0 || DateTime.parse(_result).millisecondsSinceEpoch < todaysDateCheck.millisecondsSinceEpoch) {
+                                    if (alreadyExists.size > 0 ||
+                                        DateTime.parse(_result)
+                                                .millisecondsSinceEpoch <
+                                            todaysDateCheck
+                                                .millisecondsSinceEpoch) {
                                       await showAlertDialog(
-                                          context,
-                                          'Похоже это время уже занято либо более недоступно',
-                                          false).then((value) async{
-                                            await _showAvailableTime(docName, docCategory, docUid, userUid);
-                                          });
+                                              context,
+                                              'Похоже это время уже занято либо более недоступно',
+                                              false)
+                                          .then((value) async {
+                                        await _showAvailableTime(docName,
+                                            docCategory, docUid, userUid);
+                                      });
                                     } else {
                                       await FirebaseFirestore.instance
                                           .collection('planned_visits/' +
@@ -682,13 +627,6 @@ class DocPage extends StatelessWidget {
                                                   appointments.size == 0
                                                       ? 1
                                                       : appointments.size + 1;
-                                              // FirebaseFirestore.instance.
-                                              // collection('appointments/' + docUid + '/' + docUid).doc(newAppointId.toString())
-                                              // .set({
-                                              //     'doc_uid': docUid,
-                                              //     'role': 'd',
-                                              //     'date': _result
-                                              //   });
                                               await FirebaseFirestore.instance
                                                   .collection('users')
                                                   .where('uid',
@@ -718,8 +656,7 @@ class DocPage extends StatelessWidget {
                                                   context,
                                                   'Вы успешно забронировали метсто на \n' +
                                                       _result,
-                                                  true/*,
-                                                  isDocPage: true*/));
+                                                  true));
                                         }
                                       });
                                     }
@@ -733,7 +670,6 @@ class DocPage extends StatelessWidget {
                               ),
                             ],
                           ),
-                          // }),
                         ),
                       ],
                     ),
@@ -754,7 +690,6 @@ class DocPage extends StatelessWidget {
           height: MediaQuery.of(context).size.height * 0.8,
           padding: const EdgeInsets.all(15.0),
           decoration: const BoxDecoration(
-            // color: Color.fromARGB(255, 33, 124, 243),
             color: Colors.black,
           ),
           child: SafeArea(
@@ -765,16 +700,15 @@ class DocPage extends StatelessWidget {
                   mainAxisAlignment: MainAxisAlignment.spaceBetween,
                   children: <Widget>[
                     Material(
-                      // color: const Color.fromARGB(255, 33, 124, 243),
                       color: Colors.black,
                       child: IconButton(
-                        // onPressed: (() => Navigator.pop(context, _collection)),
                         onPressed: () async {
                           await Navigator.push(
-                            context,
-                            MaterialPageRoute(
-                              builder: (context) => HomePage(true, _collection)));
-                          },
+                              context,
+                              MaterialPageRoute(
+                                  builder: (context) =>
+                                      HomePage(true, _collection)));
+                        },
                         icon: const Icon(
                           Icons.arrow_back_sharp,
                           color: Colors.white,
@@ -782,7 +716,6 @@ class DocPage extends StatelessWidget {
                       ),
                     ),
                     Material(
-                      // color: const Color.fromARGB(255, 33, 124, 243),
                       color: Colors.black,
                       child: IconButton(
                         onPressed: () => Navigator.push(
@@ -849,17 +782,15 @@ class DocPage extends StatelessWidget {
                             children: <Widget>[
                               CircleAvatar(
                                 radius: 100.0,
-                                // backgroundColor: Colors.red,
-                                backgroundImage: _data?['img'] != null && _data?['img'] != ""
-                                          ? AssetImage('assets/images/' + _data?['img'])
-                                          : const AssetImage('assets/images/home_img.png'),
-                                // backgroundImage:
-                                //     AssetImage('assets/images/home_img.png'),
+                                backgroundImage:
+                                    _data?['img'] != null && _data?['img'] != ""
+                                        ? AssetImage(
+                                            'assets/images/' + _data?['img'])
+                                        : const AssetImage(
+                                            'assets/images/home_img.png'),
                               ),
                               Text(
                                 _data?['name'] ?? '',
-                                // 'Mahmuthan B',
-                                // _data[]??'',
                                 style: const TextStyle(
                                   fontSize: 35.0,
                                   color: Colors.white,
@@ -872,29 +803,45 @@ class DocPage extends StatelessWidget {
                                 crossAxisAlignment: CrossAxisAlignment.end,
                                 children: <Widget>[
                                   Padding(
-                                    padding: const EdgeInsets.only(left: 20, right: 1.5),
-                                  child: Text(
-                                    _data?['category'] ?? '',
-                                    // '',
-                                    style: TextStyle(
-                                      fontFamily: 'SourceSansPro',
-                                      fontWeight: FontWeight.bold,
-                                      fontSize: 20.0,
-                                      color: Colors.teal.shade100,
-                                      letterSpacing: 1.5,
+                                    padding: const EdgeInsets.only(
+                                        left: 20, right: 1.5),
+                                    child: Text(
+                                      _data?['category'] ?? '',
+                                      // '',
+                                      style: TextStyle(
+                                        fontFamily: 'SourceSansPro',
+                                        fontWeight: FontWeight.bold,
+                                        fontSize: 20.0,
+                                        color: Colors.teal.shade100,
+                                        letterSpacing: 1.5,
+                                      ),
                                     ),
                                   ),
-                                  ),
-                                    (_data?['license'] != null &&
-                                      _data?['license'] == 0) 
-                                  ? const Icon(Icons.av_timer, color: Colors.yellow, size: 20,)
-                                  : (_data?['license'] != null && 
-                                        _data?['license'] == 1)
-                                  ? const Icon(Icons.check, color: Colors.green, size: 20,)
-                                  : (_data?['license'] != null && 
-                                        _data?['license'] == 2)
-                                      ? const Icon(Icons.close, color: Colors.red, size: 20,)
-                                      : const SizedBox(width: 0, height: 0,)
+                                  (_data?['license'] != null &&
+                                          _data?['license'] == 0)
+                                      ? const Icon(
+                                          Icons.av_timer,
+                                          color: Colors.yellow,
+                                          size: 20,
+                                        )
+                                      : (_data?['license'] != null &&
+                                              _data?['license'] == 1)
+                                          ? const Icon(
+                                              Icons.check,
+                                              color: Colors.green,
+                                              size: 20,
+                                            )
+                                          : (_data?['license'] != null &&
+                                                  _data?['license'] == 2)
+                                              ? const Icon(
+                                                  Icons.close,
+                                                  color: Colors.red,
+                                                  size: 20,
+                                                )
+                                              : const SizedBox(
+                                                  width: 0,
+                                                  height: 0,
+                                                )
                                 ],
                               ),
                               SizedBox(
@@ -934,7 +881,6 @@ class DocPage extends StatelessWidget {
                                   ),
                                   title: Text(
                                     _data?['email'] ?? '',
-                                    // 'mahmuthanb@gmail.com',
                                     style: TextStyle(
                                       fontSize: 20.0,
                                       fontFamily: 'SourceSansPro',
@@ -945,7 +891,6 @@ class DocPage extends StatelessWidget {
                               ),
                               Row(
                                 mainAxisAlignment: MainAxisAlignment.center,
-                                // crossAxisAlignment: CrossAxisAlignment.center,
                                 children: [
                                   Card(
                                       margin: const EdgeInsets.symmetric(
@@ -958,7 +903,6 @@ class DocPage extends StatelessWidget {
                                                   .instance.currentUser!.uid);
                                           Navigator.push(
                                               context,
-                                              // MaterialPageRoute(builder: (context) => const ChatPage(),
                                               MaterialPageRoute(
                                                 builder: (context) =>
                                                     ChatScreen(_data['uid'],
@@ -1027,13 +971,13 @@ class DocPage extends StatelessWidget {
                                                                     .toString()))
                                                             .toString(),
                                                     true);
-                                              } else{
+                                              } else {
                                                 _showAvailableTime(
-                                                  _data?['name'],
-                                                  _data?['category'],
-                                                  _data?['uid'],
-                                                  FirebaseAuth.instance
-                                                      .currentUser!.uid);
+                                                    _data?['name'],
+                                                    _data?['category'],
+                                                    _data?['uid'],
+                                                    FirebaseAuth.instance
+                                                        .currentUser!.uid);
                                               }
                                             } else {
                                               _showAvailableTime(
@@ -1055,7 +999,6 @@ class DocPage extends StatelessWidget {
                                             ),
                                             Text(
                                               'Записаться',
-                                              // 'Записаться на прием',
                                               style: TextStyle(
                                                 fontSize: 20.0,
                                                 fontFamily: 'SourceSansPro',

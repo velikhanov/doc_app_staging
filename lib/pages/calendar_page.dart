@@ -22,13 +22,10 @@ class CalendarPage extends StatelessWidget {
                     const EdgeInsets.symmetric(vertical: 8, horizontal: 20),
                 margin: const EdgeInsets.only(top: 20, right: 20, left: 20, bottom: 10),
                 decoration: const BoxDecoration(
-                  // color: Theme.of(context).primaryColor,
                   color: Colors.black,
                   borderRadius: BorderRadius.all(Radius.circular(50)),
                 ),
                 child: Text(
-                  // DateFormat('MMMM yyyy').format(DateTime(year, month)),
-                  // DateFormat.yMMM('ru').format(DateTime(year, month)).toUpperCase(),
                   DateFormat.yMMM('ru').format(DateTime(year, month))[0].toUpperCase() + DateFormat.yMMM('ru').format(DateTime(year, month)).substring(1),
                   style: Theme.of(context).textTheme.bodyText1!.copyWith(
                     color: Colors.white,

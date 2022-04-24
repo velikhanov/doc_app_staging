@@ -1,9 +1,6 @@
 import 'dart:async';
-import 'dart:developer';
-
 import 'package:awesome_notifications/awesome_notifications.dart';
 import 'package:doc_app/api/reminder_service.dart';
-import 'package:flutter/services.dart';
 import 'package:intl/intl.dart';
 import 'package:flutter/material.dart';
 
@@ -15,10 +12,6 @@ class ReminderPage extends StatefulWidget {
 }
 
 class _ReminderPageState extends State<ReminderPage> {
-
-  // Reminder reminder = Reminder();
-
-  // Future<String> data = Reminder().readJson();
   Future<void> _remindersLimitNotification(String text, String type) async{
     Widget okButton = TextButton(
       child: const Text('Закрыть',
@@ -63,56 +56,25 @@ class _ReminderPageState extends State<ReminderPage> {
         transitionDuration: const Duration(milliseconds: 200),
         pageBuilder: (BuildContext buildContext, Animation animation,
             Animation secondaryAnimation) {
-          // final TimeOfDay now = TimeOfDay.now();
-          // TimeOfDay.fromDateTime(DateTime.now().add(const Duration(minutes: 1)));
           TimeOfDay time = TimeOfDay.fromDateTime(DateTime.now().add(const Duration(minutes: 10)));
           // int dropdownvalue = 1;
-          // List<int> _numbers = [
-          //   1,
-          //   2,
-          //   3,
-          //   4,
-          //   5,
-          //   6,
-          //   7,
-          //   8,
-          //   9,
-          //   10,
-          //   11,
-          //   12,
-          //   13,
-          //   14,
-          //   15,
-          //   16,
-          //   17,
-          //   18,
-          //   19,
-          //   20,
-          //   21,
-          //   22,
-          //   23,
-          //   24
-          // ];
+          // List<int> _numbers = [1,2,3,4,5,6,7,8,9,10,11,12,13,14,15,16,17,18,19,20,21,22,23,24];
         TextEditingController titleFormController = TextEditingController();
         TextEditingController subTitleFormController = TextEditingController();
         Future<void> notify(int id, String text, String desc, String time/*, int interval*/) async {
-            // String timezone = await AwesomeNotifications().getLocalTimeZoneIdentifier();
-            // TODO check this => inspect(DateTime.parse(DateTime.now().year.toString() + DateTime.now().month.toString() + DateTime.now().day.toString() + time + ':00'));
-            await AwesomeNotifications().createNotification(
-              content: NotificationContent(
-                id: id,
-                channelKey: 'doc_app_reminder_key_1',
-                title: DateFormat.Hm().format(DateTime.now()).toString() + ', ' + text,
-                body: desc,
-              ),
-              schedule:
-                  // NotificationInterval(interval: 1/*interval * 60 * 60*/, timeZone: timezone, repeats: true),
-                        NotificationCalendar.fromDate(date: DateTime.parse(DateTime.now().year.toString() + '-' + (DateTime.now().month.toString().length < 2 ? '0' + DateTime.now().month.toString() : DateTime.now().month.toString()) + '-' + (DateTime.now().day.toString().length < 2 ? '0' + DateTime.now().day.toString() : DateTime.now().day.toString()) + ' ' + time + ':00'), repeats: true),
-            ).then((value) async{
-              if(value == true){
-                await Reminder().writeJson(id, text, desc, time/*, interval*/);
-              }
-            });
+              await AwesomeNotifications().createNotification(
+                content: NotificationContent(
+                  id: id,
+                  channelKey: 'doc_app_reminder_key_1',
+                  title: DateFormat.Hm().format(DateTime.now()).toString() + ', ' + text,
+                  body: desc,
+                ),
+                schedule: NotificationCalendar.fromDate(date: DateTime.parse(DateTime.now().year.toString() + '-' + (DateTime.now().month.toString().length < 2 ? '0' + DateTime.now().month.toString() : DateTime.now().month.toString()) + '-' + (DateTime.now().day.toString().length < 2 ? '0' + DateTime.now().day.toString() : DateTime.now().day.toString()) + ' ' + time + ':00'), repeats: true),
+              ).then((value) async{
+                if(value == true){
+                  await Reminder().writeJson(id, text, desc, time/*, interval*/);
+                }
+              });
           }
           
           Future<void> selectTime(BuildContext context) async {
@@ -169,17 +131,13 @@ class _ReminderPageState extends State<ReminderPage> {
                         child:
                         TextFormField(
                           controller: titleFormController,
-                          // cursorColor: Theme.of(context).cursorColor,
                           cursorColor: Colors.blue,
-                          // initialValue: 'Input text',
                           maxLength: 20,
                           decoration: const InputDecoration(
                             icon: Icon(Icons.title),
-                            // labelText: 'Label text',
                             labelStyle: TextStyle(
                               color: Color(0xFF6200EE),
                             ),
-                            // helperText: 'Helper text',
                             helperStyle: TextStyle(
                                 fontWeight: FontWeight.bold, fontSize: 15),
                             hintText: 'Введите название',
@@ -199,17 +157,13 @@ class _ReminderPageState extends State<ReminderPage> {
                         child:
                         TextFormField(
                           controller: subTitleFormController,
-                          // cursorColor: Theme.of(context).cursorColor,
                           cursorColor: Colors.blue,
-                          // initialValue: 'Input text',
                           maxLength: 20,
                           decoration: const InputDecoration(
                             icon: Icon(Icons.description),
-                            // labelText: 'Label text',
                             labelStyle: TextStyle(
                               color: Color(0xFF6200EE),
                             ),
-                            // helperText: 'Helper text',
                             helperStyle: TextStyle(
                                 fontWeight: FontWeight.bold, fontSize: 15),
                             hintText: 'Описание уведомления',
@@ -224,8 +178,6 @@ class _ReminderPageState extends State<ReminderPage> {
                           ),
                         ),
                       ),
-                      // const SizedBox(height: 5,),
-                      // const Text('Выберите время для напоминаний', style: TextStyle(fontWeight: FontWeight.bold, fontSize: 20), textAlign: TextAlign.center,),
                       StatefulBuilder(builder:
                           (BuildContext context, StateSetter setState) {
                         return Row(
@@ -330,20 +282,9 @@ class _ReminderPageState extends State<ReminderPage> {
                               TextButton(
                               onPressed: () async{
                                 var jsonResult = await Reminder().readJson();
-                                // if(AwesomeNotifications.maxID > 5){
-                                //   inspect(AwesomeNotifications.maxID);
-                                //   inspect('Too much notifications');
-                                //   return;
-                                // }
-                                // Timer.periodic(const Duration(minutes: 1), (timer) {
-                                //   if (DateTime.now()== DateTime.parse("2022-04-23 17:59:00")){
-                                //     timer.cancel();
                                   String notifyTime = (time.hour.toString() == '0' ? '00': time.hour.toString()) + ':' +(time.minute.toString().length < 2 ? '0' + time.minute.toString(): time.minute.toString());
                                   DateTime timeNow = DateTime.parse(DateTime.now().year.toString() + '-' + (DateTime.now().month.toString().length < 2 ? '0' + DateTime.now().month.toString() : DateTime.now().month.toString()) + '-' + (DateTime.now().day.toString().length < 2 ? '0' + DateTime.now().day.toString() : DateTime.now().day.toString()) + ' ' + notifyTime + ':00');
                                 if(jsonResult.isNotEmpty && titleFormController.text.trim().isNotEmpty && subTitleFormController.text.trim().isNotEmpty && jsonResult['count'] < 5 && timeNow.millisecondsSinceEpoch > DateTime.now().millisecondsSinceEpoch){
-                                  // await Reminder().writeJson(jsonResult['count'] + 1, titleFormController.text.trim(), subTitleFormController.text.trim())
-                                  // .then((value){setState(() {});});
-                                  // Navigator.pop(buildContext);
                                   notify(jsonResult['count'] + 1, titleFormController.text.trim(), subTitleFormController.text.trim(), notifyTime/*, dropdownvalue*/).then((value){
                                     setState(() {});
                                     Navigator.pop(buildContext);
@@ -355,9 +296,6 @@ class _ReminderPageState extends State<ReminderPage> {
                                 }else{
                                   await _remindersLimitNotification('Что то пошло не так, пожалуйста повторите попытку позже', 'else');
                                 }
-                                    // notify(jsonResult['count'] + 1, titleFormController.text.trim(), subTitleFormController.text.trim(), time, dropdownvalue);
-                                //   }
-                                // });
                               },
                               style: ButtonStyle(
                                 backgroundColor:
@@ -393,11 +331,7 @@ class _ReminderPageState extends State<ReminderPage> {
   Widget build(BuildContext context) {
     return SafeArea(
       child: Scaffold(
-        // backgroundColor: const Color.fromARGB(255, 0, 0, 0),
         appBar: AppBar(
-          // foregroundColor: const Color.fromARGB(255, 0, 0, 0),
-          // backgroundColor: const Color.fromARGB(255, 0, 0, 0),
-          // brightness: Brightness.dark,
           centerTitle: true,
           title: RichText(
             textAlign: TextAlign.center,
@@ -429,9 +363,6 @@ class _ReminderPageState extends State<ReminderPage> {
                   future: Reminder().readJson(),
                   builder: (BuildContext context,
                       AsyncSnapshot snapshot) {
-                    // if (reminderCount == null || snapshot.connectionState == ConnectionState.waiting) {
-                    //   return const Text('Загрузка данных', style: TextStyle(fontWeight: FontWeight.bold, fontSize: 20), textAlign: TextAlign.center,);
-                    // }
                     if (snapshot.hasData) {
                       if(snapshot.data['count'] != null && snapshot.data['count'] > 0){
                         return Column(
@@ -460,9 +391,6 @@ class _ReminderPageState extends State<ReminderPage> {
                                       style: const TextStyle(
                                           fontWeight: FontWeight.bold, color: Colors.white)),
                                   leading: const Icon(Icons.notifications_active, color: Colors.white, size: 40),
-                                  // leading: CircleAvatar(
-                                  //     backgroundImage: AssetImage(
-                                  //         'assets/images/reminder.png')),
                                   trailing: IconButton(
                                     onPressed: ((){
                                       Reminder().deleteFromJson(index)
@@ -472,11 +400,7 @@ class _ReminderPageState extends State<ReminderPage> {
                                           AwesomeNotifications().dismiss(index);
                                         });
                                       });
-                                      // AwesomeNotifications().cancelSchedule(_data['id']).then((value){
-
-                                      // });
-                                    }), 
-                                    // onPressed: null, 
+                                    }),
                                     icon: const Icon(Icons.close, color: Colors.white, size: 30,)),
                                   ));
                                 }),
@@ -484,7 +408,6 @@ class _ReminderPageState extends State<ReminderPage> {
                             TextButton(
                               onPressed: () {
                                 _createReminder();
-                                // Reminder().deleteFromJson(2);
                               },
                               style: ButtonStyle(
                               backgroundColor:
@@ -504,9 +427,9 @@ class _ReminderPageState extends State<ReminderPage> {
                                       fontWeight: FontWeight.bold),
                                   textAlign: TextAlign.center,
                                 ),
-                          ),
-                              ],
-                            );
+                              ),
+                            ],
+                          );
                       }else{
                         return Column(
                           mainAxisAlignment: MainAxisAlignment.center,
@@ -516,7 +439,6 @@ class _ReminderPageState extends State<ReminderPage> {
                               TextButton(
                                 onPressed: () {
                                   _createReminder();
-                                  // Reminder().deleteFromJson(2);
                                 },
                                 style: ButtonStyle(
                                 backgroundColor:
@@ -548,7 +470,6 @@ class _ReminderPageState extends State<ReminderPage> {
                             TextButton(
                               onPressed: () {
                                 _createReminder();
-                                // Reminder().deleteFromJson(2);
                               },
                               style: ButtonStyle(
                               backgroundColor:

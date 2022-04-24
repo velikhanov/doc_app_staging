@@ -26,8 +26,15 @@ class _SignUpPage extends State<SignUpPage> {
           child: Container(
             padding: const EdgeInsets.all(20),
             child: Text(
-              "DocAppNet, Inc - " + DateFormat.y().format(DateTime.parse(DateTime.now().toString())).toString() + '\nAll right reserved',
-              style: const TextStyle(color: Colors.white, fontSize: 17.5,),
+              "DocAppNet, Inc - " +
+                  DateFormat.y()
+                      .format(DateTime.parse(DateTime.now().toString()))
+                      .toString() +
+                  '\nAll right reserved',
+              style: const TextStyle(
+                color: Colors.white,
+                fontSize: 17.5,
+              ),
               textAlign: TextAlign.center,
             ),
           )),
@@ -48,7 +55,8 @@ class _SignUpPageContent extends State<SignUpPageContent> {
   TextEditingController passwordController = TextEditingController();
   TextEditingController passwordControllerConf = TextEditingController();
   bool isdoc = false;
-  final Future<QuerySnapshot> _items = getCategoriesSignUp('categories/1/doctors');
+  final Future<QuerySnapshot> _items =
+      getCategoriesSignUp('categories/1/doctors');
   int userId = 1;
   int doctorId = 1;
   int roleId = 1;
@@ -64,19 +72,19 @@ class _SignUpPageContent extends State<SignUpPageContent> {
 
   @override
   Widget build(BuildContext context) {
-    if(firstOpen == true){
-    _roleCount.then((value){
-      roleId = value.size + 1;
-    });
+    if (firstOpen == true) {
+      _roleCount.then((value) {
+        roleId = value.size + 1;
+      });
     }
-    if(firstOpen == true && isdoc == true){
-      _docCount.then((val){
+    if (firstOpen == true && isdoc == true) {
+      _docCount.then((val) {
         doctorId = val.size + 1;
       });
     }
 
-    if(isdoc == false){
-      _docCount.then((val){
+    if (isdoc == false) {
+      _docCount.then((val) {
         userId = val.size + 1;
       });
     }
@@ -230,89 +238,135 @@ class _SignUpPageContent extends State<SignUpPageContent> {
           Row(
             mainAxisAlignment: MainAxisAlignment.center,
             children: [
-              isdoc == true ? const Text('Я врач', style: TextStyle(color: Colors.white, fontSize: 17.5,)) : const Text('Я пациент', style: TextStyle(color: Colors.white, fontSize: 17.5,)),
+              isdoc == true
+                  ? const Text('Я врач',
+                      style: TextStyle(
+                        color: Colors.white,
+                        fontSize: 17.5,
+                      ))
+                  : const Text('Я пациент',
+                      style: TextStyle(
+                        color: Colors.white,
+                        fontSize: 17.5,
+                      )),
               Switch(
                 value: isdoc,
                 onChanged: (value) {
                   setState(() {
                     isdoc = value;
-                    if(firstOpen == true && isdoc == true){
+                    if (firstOpen == true && isdoc == true) {
                       _docCount = getDoctorData('doctors/1/1', lastId: true);
-                    }else if(firstOpen == false && isdoc == false){
+                    } else if (firstOpen == false && isdoc == false) {
                       _docCount = getDoctorData('users', lastId: true);
-                    }else{
+                    } else {
                       _docCount = getDoctorData('users', lastId: true);
                     }
                   });
                 },
-                activeTrackColor: Colors.lightGreenAccent, 
+                activeTrackColor: Colors.lightGreenAccent,
                 activeColor: Colors.green,
               ),
             ],
           ),
-          isdoc == true 
-          ? FutureBuilder<QuerySnapshot>(
-              future: _items,
-              builder: (_, snapshot) {
+          isdoc == true
+              ? FutureBuilder<QuerySnapshot>(
+                  future: _items,
+                  builder: (_, snapshot) {
+                    if (snapshot.hasError) {
+                      return const Text(
+                        'Ошибка во время загрузки категорий..',
+                        style: TextStyle(color: Colors.red, fontSize: 17.5),
+                        textAlign: TextAlign.center,
+                      );
+                    }
 
-                if (snapshot.hasError){
-                  return const Text('Ошибка во время загрузки категорий..', style: TextStyle(color: Colors.red, fontSize: 17.5), textAlign: TextAlign.center,);
-                }
+                    if (snapshot.connectionState == ConnectionState.waiting) {
+                      return const Text(
+                        'Загрузка категорий..',
+                        style: TextStyle(
+                          color: Color.fromARGB(255, 88, 171, 238),
+                          fontSize: 17.5,
+                        ),
+                        textAlign: TextAlign.center,
+                      );
+                    }
 
-                if (snapshot.connectionState == ConnectionState.waiting) {
-                  return const Text('Загрузка категорий..', style: TextStyle(color: Color.fromARGB(255, 88, 171, 238), fontSize: 17.5, ), textAlign: TextAlign.center,);
-                }
-
-                if (snapshot.hasData) {
-                  List<QueryDocumentSnapshot<Object?>> _data = snapshot.data!.docs;
-                  return Row(
-                    mainAxisAlignment: MainAxisAlignment.center,
-                    children: [
-                      const Text('Категория', style: TextStyle(color: Colors.white, fontSize: 17.5,)),
-                      const SizedBox(width: 15,),
-                      DropdownButton(
-                        value: dropdownvalue,
-                        style: const TextStyle(color: Colors.white, fontSize: 17.5,),
-                        alignment: AlignmentDirectional.center,
-                        dropdownColor: Colors.black,
-                          icon: const Icon(Icons.keyboard_arrow_down),
-
-                          items: _data.map((items) {
-                            return DropdownMenuItem(
+                    if (snapshot.hasData) {
+                      List<QueryDocumentSnapshot<Object?>> _data =
+                          snapshot.data!.docs;
+                      return Row(
+                        mainAxisAlignment: MainAxisAlignment.center,
+                        children: [
+                          const Text('Категория',
+                              style: TextStyle(
+                                color: Colors.white,
+                                fontSize: 17.5,
+                              )),
+                          const SizedBox(
+                            width: 15,
+                          ),
+                          DropdownButton(
+                            value: dropdownvalue,
+                            style: const TextStyle(
+                              color: Colors.white,
+                              fontSize: 17.5,
+                            ),
+                            alignment: AlignmentDirectional.center,
+                            dropdownColor: Colors.black,
+                            icon: const Icon(Icons.keyboard_arrow_down),
+                            items: _data.map((items) {
+                              return DropdownMenuItem(
                                 value: items['category'],
                                 child: Text(items['category']),
                                 onTap: () => setState(() {
                                   firstOpen = false;
                                   categoryId = items['id_category'] as int;
-                                  _docCount = getDoctorData('doctors/' + items['id_category'].toString() + '/' + items['id_category'].toString(), lastId: true);
-                                  _docCount.then((val){
+                                  _docCount = getDoctorData(
+                                      'doctors/' +
+                                          items['id_category'].toString() +
+                                          '/' +
+                                          items['id_category'].toString(),
+                                      lastId: true);
+                                  _docCount.then((val) {
                                     doctorId = val.size + 1;
                                   });
                                 }),
-                            );
-                          }).toList(),
-
-                        onChanged: (newValue){
-                          setState(() {
-                            dropdownvalue = newValue.toString();
-                          });
-                        },
-                      ),
-                    ],
-                  );
-                }else{
-                  return Row(
-                    mainAxisAlignment: MainAxisAlignment.center,
-                    children: const [
-                      Text('Категория', style: TextStyle(color: Colors.white, fontSize: 17.5,)),
-                      SizedBox(width: 15,),
-                      Text('Нет доступных категорий', style: TextStyle(color: Colors.white, fontSize: 17.5, decoration: TextDecoration.underline,)),
-                    ],
-                  );
-                }
-              }
-            )
-          : const SizedBox(height: 0, width: 0,),
+                              );
+                            }).toList(),
+                            onChanged: (newValue) {
+                              setState(() {
+                                dropdownvalue = newValue.toString();
+                              });
+                            },
+                          ),
+                        ],
+                      );
+                    } else {
+                      return Row(
+                        mainAxisAlignment: MainAxisAlignment.center,
+                        children: const [
+                          Text('Категория',
+                              style: TextStyle(
+                                color: Colors.white,
+                                fontSize: 17.5,
+                              )),
+                          SizedBox(
+                            width: 15,
+                          ),
+                          Text('Нет доступных категорий',
+                              style: TextStyle(
+                                color: Colors.white,
+                                fontSize: 17.5,
+                                decoration: TextDecoration.underline,
+                              )),
+                        ],
+                      );
+                    }
+                  })
+              : const SizedBox(
+                  height: 0,
+                  width: 0,
+                ),
           // Signup Submit button
           Container(
             width: 570,
@@ -321,47 +375,44 @@ class _SignUpPageContent extends State<SignUpPageContent> {
             child: ElevatedButton(
               style: ButtonStyle(
                 shape: MaterialStateProperty.all<RoundedRectangleBorder>(
-                  RoundedRectangleBorder(borderRadius: BorderRadius.circular(30)),
+                  RoundedRectangleBorder(
+                      borderRadius: BorderRadius.circular(30)),
                 ),
               ),
               onPressed: () {
-                if(nameController.text.trim().isEmpty && emailController.text.trim().isEmpty && passwordController.text.trim().isEmpty && passwordController.text.trim() != passwordControllerConf.text.trim()){
+                if (nameController.text.trim().isEmpty &&
+                    emailController.text.trim().isEmpty &&
+                    passwordController.text.trim().isEmpty &&
+                    passwordController.text.trim() !=
+                        passwordControllerConf.text.trim()) {
                   return;
-                }else{
+                } else {
                   FocusManager.instance.primaryFocus?.unfocus();
-                  if(isdoc == true){
+                  if (isdoc == true) {
                     context.read<AuthenticationService>().signUp(
-                      nameController.text.trim(),
-                      emailController.text.trim(),
-                      passwordController.text.trim(),
-                      isdoc: isdoc,
-                      categoryId: categoryId,
-                      doctorId: doctorId,
-                      categoryName: dropdownvalue,
-                      // lastRole: _roleCount.then((value){
-                      //   value.size + 1;
-                      // })
-                      lastRole: roleId
-                    );
-                  }else{
+                        nameController.text.trim(),
+                        emailController.text.trim(),
+                        passwordController.text.trim(),
+                        isdoc: isdoc,
+                        categoryId: categoryId,
+                        doctorId: doctorId,
+                        categoryName: dropdownvalue,
+                        lastRole: roleId);
+                  } else {
                     context.read<AuthenticationService>().signUp(
-                      nameController.text.trim(),
-                      emailController.text.trim(),
-                      passwordController.text.trim(),
-                      userId: userId,
-                      // lastRole: _roleCount.then((value){
-                      //   value.size + 1;
-                      // })
-                      lastRole: roleId
-                    );
+                        nameController.text.trim(),
+                        emailController.text.trim(),
+                        passwordController.text.trim(),
+                        userId: userId,
+                        lastRole: roleId);
                   }
-                  // Navigator.push(
-                  //   context,
-                  //   MaterialPageRoute(builder: (context) => const MyApp(),
-                  // ));
                 }
               },
-              child: const Text("Зарегистрироваться", style: TextStyle(color: Colors.white, fontSize: 20,)),
+              child: const Text("Зарегистрироваться",
+                  style: TextStyle(
+                    color: Colors.white,
+                    fontSize: 20,
+                  )),
             ),
           ),
 
@@ -372,12 +423,23 @@ class _SignUpPageContent extends State<SignUpPageContent> {
             child: Row(
               mainAxisAlignment: MainAxisAlignment.center,
               children: <Widget>[
-                const Text('Есть аккаунт?', style: TextStyle(color: Colors.white, fontSize: 15,)),
+                const Text('Есть аккаунт?',
+                    style: TextStyle(
+                      color: Colors.white,
+                      fontSize: 15,
+                    )),
                 TextButton(
-                  onPressed: (() => 
-                    Navigator.push(context, MaterialPageRoute(builder: (context) => const SignInPage(),
-                  ))), 
-                  child: const Text('Войти', style: TextStyle(color: Colors.white, fontSize: 17.5, decoration: TextDecoration.underline,))),
+                    onPressed: (() => Navigator.push(
+                        context,
+                        MaterialPageRoute(
+                          builder: (context) => const SignInPage(),
+                        ))),
+                    child: const Text('Войти',
+                        style: TextStyle(
+                          color: Colors.white,
+                          fontSize: 17.5,
+                          decoration: TextDecoration.underline,
+                        ))),
               ],
             ),
           ),

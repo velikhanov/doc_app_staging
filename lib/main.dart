@@ -1,5 +1,3 @@
-import 'dart:developer';
-
 import 'package:awesome_notifications/awesome_notifications.dart';
 import 'package:doc_app/auth/auth_service.dart';
 import 'package:doc_app/auth/signin_page.dart';
@@ -16,29 +14,28 @@ Future<void> main() async {
       null,
       [
         NotificationChannel(
-          channelKey: "doc_app_reminder_key_1",
-          channelName: "Doctor Application Reminder",
-          channelDescription: "Doctor Application Reminder",
-          defaultColor: const Color(0XFF9050DD),
-          importance: NotificationImportance.Max,
-          ledColor: Colors.white,
-          playSound: true,
-          enableLights: true,
-          enableVibration: true
-        )
+            channelKey: "doc_app_reminder_key_1",
+            channelName: "Doctor Application Reminder",
+            channelDescription: "Doctor Application Reminder",
+            defaultColor: const Color(0XFF9050DD),
+            importance: NotificationImportance.Max,
+            ledColor: Colors.white,
+            playSound: true,
+            enableLights: true,
+            enableVibration: true)
       ],
       channelGroups: [
-        NotificationChannelGroup(channelGroupkey: 'doc_app_reminder_key_1', channelGroupName: 'Doctor Application Reminder'),
+        NotificationChannelGroup(
+            channelGroupkey: 'doc_app_reminder_key_1',
+            channelGroupName: 'Doctor Application Reminder'),
       ],
-      debug: true
-  );
+      debug: true);
   await Firebase.initializeApp();
   runApp(const MyApp());
 }
 
 class MyApp extends StatelessWidget {
   const MyApp({Key? key}) : super(key: key);
-
 
   @override
   Widget build(BuildContext context) {
@@ -48,21 +45,24 @@ class MyApp extends StatelessWidget {
           create: (_) => AuthenticationService(FirebaseAuth.instance),
         ),
         StreamProvider(
-          create: (context) => context.read<AuthenticationService>().authStateChanges, initialData: null,
+          create: (context) =>
+              context.read<AuthenticationService>().authStateChanges,
+          initialData: null,
         )
       ],
       child: MaterialApp(
         theme: ThemeData(
           primaryColor: Colors.blue[300],
-          colorScheme: ColorScheme.fromSwatch().copyWith(secondary: Colors.blueAccent),
+          colorScheme:
+              ColorScheme.fromSwatch().copyWith(secondary: Colors.blueAccent),
+        ),
+        title: 'Hello',
+        home: const AuthenticationWrapper(),
       ),
-      title: 'Hello',
-      home: const AuthenticationWrapper(),
-      // home: const HomePage(),
-    ),
     );
   }
 }
+
 class AuthenticationWrapper extends StatelessWidget {
   const AuthenticationWrapper({Key? key}) : super(key: key);
 

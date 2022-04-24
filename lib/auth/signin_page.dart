@@ -1,7 +1,6 @@
 import 'package:doc_app/auth/auth_service.dart';
 import 'package:doc_app/auth/signup_page.dart';
 import 'package:doc_app/main.dart';
-// import 'package:doc_app/pages/home_page.dart';
 import 'package:flutter/material.dart';
 import 'package:intl/intl.dart';
 import 'package:provider/provider.dart';
