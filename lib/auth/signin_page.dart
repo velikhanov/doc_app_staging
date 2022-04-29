@@ -141,7 +141,7 @@ class _SignInPageContent extends State<SignInPageContent> {
                   controller: passwordController, // Controller for Password
                   decoration: InputDecoration(
                       border: InputBorder.none,
-                      hintText: "Пароль",
+                      hintText: "Введите пароль",
                       contentPadding: const EdgeInsets.all(20),
                       // Adding the visibility icon to toggle visibility of the password field
                       suffixIcon: IconButton(

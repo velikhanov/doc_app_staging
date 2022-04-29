@@ -103,7 +103,7 @@ class _SignUpPageContent extends State<SignUpPageContent> {
           // Signup Text
           Center(
             child: Container(
-              height: 175,
+              height: 35,
               width: 400,
               alignment: Alignment.center,
               child: const Text(
@@ -138,7 +138,7 @@ class _SignUpPageContent extends State<SignUpPageContent> {
 
           // Signup Info
           Container(
-            height: 215,
+            height: 285,
             width: 530,
             decoration: const BoxDecoration(
                 borderRadius: BorderRadius.all(Radius.circular(20)),
@@ -189,7 +189,7 @@ class _SignUpPageContent extends State<SignUpPageContent> {
                   controller: passwordController, // Controller for Password
                   decoration: InputDecoration(
                       border: InputBorder.none,
-                      hintText: "Пароль",
+                      hintText: "Введите пароль",
                       contentPadding: const EdgeInsets.all(20),
                       // Adding the visibility icon to toggle visibility of the password field
                       suffixIcon: IconButton(

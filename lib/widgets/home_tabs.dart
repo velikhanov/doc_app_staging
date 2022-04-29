@@ -3,6 +3,7 @@ import 'package:doc_app/pages/chats_page.dart';
 import 'package:doc_app/pages/doc_page.dart';
 import 'package:doc_app/api/get_data.dart';
 import 'package:doc_app/pages/documents.dart';
+import 'package:doc_app/pages/reminder.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
@@ -98,7 +99,8 @@ class _HomeTabsState extends State<HomeTabs> with TickerProviderStateMixin {
             physics: const NeverScrollableScrollPhysics(),
             children: <Widget>[
               /////
-              FutureBuilder(
+              Scaffold(
+              body: FutureBuilder(
                 future: _category,
                 builder: (BuildContext context, AsyncSnapshot snapshot) {
                   if (snapshot.hasError) {
@@ -310,7 +312,21 @@ class _HomeTabsState extends State<HomeTabs> with TickerProviderStateMixin {
                   }
                 },
               ),
+              floatingActionButton: FloatingActionButton(
+                  onPressed: (() {
+                      Navigator.push(
+                        context,
+                        MaterialPageRoute(
+                          builder: (context) => const ReminderPage(),
+                        ),);
+                  }),
+                  backgroundColor: Colors.black,
+                  foregroundColor: Colors.white,
+                  child: const Icon(Icons.notification_add,),
+                ),),
               /////
+              Scaffold(
+                        body: 
               FutureBuilder(
                   future: _plannedVisits,
                   builder: (BuildContext context,
@@ -412,6 +428,18 @@ class _HomeTabsState extends State<HomeTabs> with TickerProviderStateMixin {
                       );
                     }
                   }),
+                  floatingActionButton: FloatingActionButton(
+                    onPressed: (() {
+                        Navigator.push(
+                          context,
+                          MaterialPageRoute(
+                            builder: (context) => const ReminderPage(),
+                          ),);
+                    }),
+                    backgroundColor: Colors.black,
+                    foregroundColor: Colors.white,
+                    child: const Icon(Icons.notification_add,),
+                  ),),
               /////
               const CalendarPage(),
               /////
