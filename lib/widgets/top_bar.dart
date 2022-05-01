@@ -6,6 +6,7 @@ import 'package:doc_app/auth/auth_service.dart';
 import 'package:doc_app/auth/signin_page.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter/services.dart';
 import 'package:provider/provider.dart';
 
 class TopBar extends StatelessWidget {
@@ -30,8 +31,8 @@ class TopBar extends StatelessWidget {
                   builder: (BuildContext context, AsyncSnapshot snapshot) {
                     if (snapshot.hasData) {
                       // var _data = snapshot.data.docs[0];
-                      nameController.text = snapshot.data.docs[0]['name'];
-                      phoneController.text = snapshot.data.docs[0]['phone'];
+                      nameController.text = snapshot.data.docs[0]['name'].toString();
+                      phoneController.text = snapshot.data.docs[0]['phone'].toString();
                       return Column(
                         mainAxisSize: MainAxisSize.min,
                         children: <Widget>[
@@ -43,7 +44,17 @@ class TopBar extends StatelessWidget {
                                     : null),
                           ),
                           TextField(
+                            onTap: (){
+                              if(phoneController.text.trim().isEmpty){
+                                phoneController.text = '+994';
+                              }
+                            },
                             keyboardType: TextInputType.phone,
+                            inputFormatters: <TextInputFormatter>[
+                              // FilteringTextInputFormatter.digitsOnly,
+                              FilteringTextInputFormatter.allow(RegExp('[0-9+]'))
+                            ],
+                            maxLength: 13,
                             controller: phoneController,
                             decoration: InputDecoration(
                                 hintText: phoneController.text.trim().isEmpty

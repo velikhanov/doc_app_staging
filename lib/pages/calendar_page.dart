@@ -59,21 +59,20 @@ class CalendarPage extends StatelessWidget {
         dayBuilder: (context, date) {
           return Column(
             children: [
-              DateFormat('d').format(date) == DateFormat('d').format(DateTime.now()) 
+              DateFormat('yyyy-MM-dd').format(date) == DateFormat('yyyy-MM-dd').format(DateTime.now()) 
               ? Container(
                   decoration: const BoxDecoration(
                     borderRadius: BorderRadius.all(Radius.circular(15.0)),
                     color: Colors.black,
                   ),
                   padding: const EdgeInsets.symmetric(vertical: 4.0, horizontal: 8.0),
-                  child: 
-                Text(
-                  DateFormat('d').format(date),
-                  style: const TextStyle(
-                    fontSize: 20,
-                    color: Colors.white,
-                  ),
-                ),
+                  child: Text(
+                      DateFormat('d').format(date),
+                      style: const TextStyle(
+                        fontSize: 20,
+                        color: Colors.white,
+                      ),
+                    ),
               )
               : Text(
                   DateFormat('d').format(date),
