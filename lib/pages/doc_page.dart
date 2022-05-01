@@ -1,4 +1,5 @@
 import 'dart:async';
+import 'dart:developer';
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:doc_app/api/get_data.dart';
 import 'package:doc_app/pages/chat_screen.dart';
@@ -59,7 +60,7 @@ class DocPage extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     showAlertDialog(
-        BuildContext context, String message, bool isSuccess) async {
+        BuildContext alertContext, String message, bool isSuccess) async {
       // set up the button
       Widget okButton = TextButton(
         child: const Text('Закрыть',
@@ -67,13 +68,15 @@ class DocPage extends StatelessWidget {
             textAlign: TextAlign.center),
         onPressed: () {
           if (isSuccess == true) {
+            // inspect('s');
             Navigator.push(
                 context,
                 MaterialPageRoute(
-                  builder: (context) => DocPage(_collection, _id),
+                  builder: (alertContext) => DocPage(_collection, _id),
                 ));
+            // Navigator.of(alertContext)..pop()..pop();
           } else {
-            Navigator.of(context).pop();
+            Navigator.of(alertContext).pop();
           }
         },
       );
@@ -90,8 +93,8 @@ class DocPage extends StatelessWidget {
 
       // show the dialog
       return await showDialog(
-        context: context,
-        builder: (BuildContext context) {
+        context: alertContext,
+        builder: (BuildContext alertContext) {
           return alert;
         },
       );
@@ -790,7 +793,7 @@ class DocPage extends StatelessWidget {
                                             'assets/images/home_img.png'),
                               ),
                               Text(
-                                _data?['name'] ?? '',
+                                _data?['name'] == "" ? 'Доктор Айболит' : _data?['name'],
                                 style: const TextStyle(
                                   fontSize: 35.0,
                                   color: Colors.white,
@@ -860,8 +863,8 @@ class DocPage extends StatelessWidget {
                                     color: Colors.teal,
                                   ),
                                   title: Text(
-                                    _data?['phone'] ??
-                                        '+(994) 55-555-55-55',
+                                    _data?['phone'] == "" ?
+                                        /*'+(994) 55-555-55-55'*/ 'Номер не указан' : _data?['phone'],
                                     // '+90 506 922 92 21',
                                     style: TextStyle(
                                       fontSize: 20.0,
