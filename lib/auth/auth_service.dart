@@ -36,7 +36,7 @@ class AuthenticationService {
   /// This is to make it as easy as possible but a better way would be to
   /// use your own custom class that would take the exception and return better
   /// error messages. That way you can throw, return or whatever you prefer with that instead.
-  Future<Object?> signUp(String name, String email, String password,{bool isdoc = false, int categoryId = 1, String categoryName = 'Терапевт', int doctorId = 1, int userId = 1, int lastRole = 1}) async {
+  Future<Object?> signUp(/*String name, */String email, String password,{bool isdoc = false, int categoryId = 1, String categoryName = 'Терапевт', int doctorId = 1, int userId = 1, int lastRole = 1}) async {
     try {
       UserCredential _result = await _firebaseAuth.createUserWithEmailAndPassword(email: email, password: password);
       if(_result.user!.uid.isNotEmpty){
@@ -44,7 +44,7 @@ class AuthenticationService {
         if(isdoc == true){
           DocumentReference<Map<String, dynamic>> _doctor = FirebaseFirestore.instance.collection('doctors/' + categoryId.toString() + '/' + categoryId.toString()).doc(doctorId.toString());
           _doctor.set({
-            'name': name,
+            'name': "",
             'category': categoryName,
             'id_category': categoryId.toInt(),
             'id_doctor': doctorId.toInt(),
@@ -61,7 +61,7 @@ class AuthenticationService {
         }else{
           DocumentReference<Map<String, dynamic>> _user = FirebaseFirestore.instance.collection('users').doc(userId.toString());
           _user.set({
-            'name': name,
+            'name': "",
             'email': email,
             'id_user': userId,
             'phone': "",

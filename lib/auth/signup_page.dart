@@ -380,7 +380,7 @@ class _SignUpPageContent extends State<SignUpPageContent> {
                 ),
               ),
               onPressed: () {
-                if (nameController.text.trim().isEmpty &&
+                if (/*nameController.text.trim().isEmpty &&*/
                     emailController.text.trim().isEmpty &&
                     passwordController.text.trim().isEmpty &&
                     passwordController.text.trim() !=
@@ -390,7 +390,7 @@ class _SignUpPageContent extends State<SignUpPageContent> {
                   FocusManager.instance.primaryFocus?.unfocus();
                   if (isdoc == true) {
                     context.read<AuthenticationService>().signUp(
-                        nameController.text.trim(),
+                        /*nameController.text.trim(),*/
                         emailController.text.trim(),
                         passwordController.text.trim(),
                         isdoc: isdoc,
@@ -400,7 +400,7 @@ class _SignUpPageContent extends State<SignUpPageContent> {
                         lastRole: roleId);
                   } else {
                     context.read<AuthenticationService>().signUp(
-                        nameController.text.trim(),
+                        /*nameController.text.trim(),*/
                         emailController.text.trim(),
                         passwordController.text.trim(),
                         userId: userId,
