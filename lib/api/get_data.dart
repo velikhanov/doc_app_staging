@@ -33,6 +33,28 @@ getCategoriesSignUp(String _collection) {
 
   return _snapshot;
 }
+// Returns users pesonal data for editing
+getUserPersonalData() async{
+  QuerySnapshot<Map<String, dynamic>> _userRole = await FirebaseFirestore
+      .instance
+      .collection('roles')
+      .where('uid', isEqualTo: FirebaseAuth.instance.currentUser!.uid)
+      .get();
+
+  for (QueryDocumentSnapshot<Map<String, dynamic>> element in _userRole.docs) {
+    if (element.data()['role'] == 'd') {
+      Future<QuerySnapshot<Map<String, dynamic>>> _snapshot =
+          FirebaseFirestore.instance.collection('doctors/' + element.data()['path'].toString()).where('uid', isEqualTo: FirebaseAuth.instance.currentUser!.uid).get();
+
+      return _snapshot;
+    }else if (element.data()['role'] == 'p') {
+      Future<QuerySnapshot<Map<String, dynamic>>> _snapshot =
+        FirebaseFirestore.instance.collection('users').where('uid', isEqualTo: FirebaseAuth.instance.currentUser!.uid).get();
+
+      return _snapshot;
+    }
+  }
+}
 
 // Get doctor's details on his personal page
 getDoctorData(String _collection, {int? id, bool lastId = false}) {
@@ -60,7 +82,6 @@ getUserRole(String _collection) {
 }
 
 // Get visit history list
-
 getPlannedVisits(String _currentUser) async {
   QuerySnapshot<Map<String, dynamic>> _userRole = await FirebaseFirestore
       .instance

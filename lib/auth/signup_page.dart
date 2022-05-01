@@ -103,7 +103,7 @@ class _SignUpPageContent extends State<SignUpPageContent> {
           // Signup Text
           Center(
             child: Container(
-              height: 35,
+              height: isdoc == true ? 70 : 100,
               width: 400,
               alignment: Alignment.center,
               child: const Text(
@@ -138,30 +138,30 @@ class _SignUpPageContent extends State<SignUpPageContent> {
 
           // Signup Info
           Container(
-            height: 285,
+            height: 210,
             width: 530,
             decoration: const BoxDecoration(
                 borderRadius: BorderRadius.all(Radius.circular(20)),
                 color: Colors.white),
             child: Column(
               children: <Widget>[
-                TextFormField(
-                  onTap: () {
-                    setState(() {
-                      _isVisible = false;
-                    });
-                  },
-                  controller: nameController, // Controller for Username
-                  decoration: const InputDecoration(
-                      border: InputBorder.none,
-                      hintText: "Введите ваше имя",
-                      contentPadding: EdgeInsets.all(20)),
-                  onEditingComplete: () => FocusScope.of(context).nextFocus(),
-                ),
-                const Divider(
-                  thickness: 7.5,
-                  color: Color.fromRGBO(40, 38, 56, 1),
-                ),
+                // TextFormField(
+                //   onTap: () {
+                //     setState(() {
+                //       _isVisible = false;
+                //     });
+                //   },
+                //   controller: nameController, // Controller for Username
+                //   decoration: const InputDecoration(
+                //       border: InputBorder.none,
+                //       hintText: "Введите ваше имя",
+                //       contentPadding: EdgeInsets.all(20)),
+                //   onEditingComplete: () => FocusScope.of(context).nextFocus(),
+                // ),
+                // const Divider(
+                //   thickness: 7.5,
+                //   color: Color.fromRGBO(40, 38, 56, 1),
+                // ),
                 TextFormField(
                   onTap: () {
                     setState(() {

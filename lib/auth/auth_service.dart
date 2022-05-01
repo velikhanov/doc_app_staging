@@ -48,21 +48,24 @@ class AuthenticationService {
             'category': categoryName,
             'id_category': categoryId.toInt(),
             'id_doctor': doctorId.toInt(),
+            'phone': "",
             'email': email,
             'uid': _result.user?.uid,
             'license': 0
           });
           _role.set({
             'uid': _result.user?.uid,
-            'role': 'd'
+            'role': 'd',
+            'path': categoryId.toString() + '/' + categoryId.toString() 
           });
         }else{
           DocumentReference<Map<String, dynamic>> _user = FirebaseFirestore.instance.collection('users').doc(userId.toString());
           _user.set({
             'name': name,
             'email': email,
-            'user_id': userId,
-            'UID': _result.user?.uid
+            'id_user': userId,
+            'phone': "",
+            'uid': _result.user?.uid
           });
           _role.set({
             'uid': _result.user?.uid,

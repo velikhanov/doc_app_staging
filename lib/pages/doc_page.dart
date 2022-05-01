@@ -860,7 +860,7 @@ class DocPage extends StatelessWidget {
                                     color: Colors.teal,
                                   ),
                                   title: Text(
-                                    _data?['phone_number'] ??
+                                    _data?['phone'] ??
                                         '+(994) 55-555-55-55',
                                     // '+90 506 922 92 21',
                                     style: TextStyle(

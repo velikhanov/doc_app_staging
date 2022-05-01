@@ -18,13 +18,15 @@ class _HomePageState extends State<HomePage> {
       onWillPop: () async => false,
       child: Scaffold(
         backgroundColor: Colors.white,
-        body: Column(
-          children: <Widget>[
-            const TopBar(),
-            widget.fromDocPage == true && widget.route.isNotEmpty
-              ? HomeTabs(widget.fromDocPage, widget.route)
-              : const HomeTabs(false, ''),
-          ],
+        body: SingleChildScrollView(
+          child: Column(
+            children: <Widget>[
+              const TopBar(),
+              widget.fromDocPage == true && widget.route.isNotEmpty
+                ? HomeTabs(widget.fromDocPage, widget.route)
+                : const HomeTabs(false, ''),
+            ],
+          ),
         ),
       ),
     );
