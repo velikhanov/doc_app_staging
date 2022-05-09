@@ -1,3 +1,5 @@
+import 'dart:developer';
+
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:doc_app/api/get_data.dart';
 import 'package:doc_app/api/storage_service.dart';
@@ -229,6 +231,7 @@ class _DocumentsPageState extends State<DocumentsPage> {
                     crossAxisCount: 3,
                     children: List.generate(snapshot.data.length, (index) {
                       var _data = snapshot.data[index];
+                      String attachmentName = _data['attachment'];
                       var attachment = Storage().getImg(isDoc == true &&
                               FirebaseAuth.instance.currentUser!.uid ==
                                   _data['sender']
@@ -305,18 +308,49 @@ class _DocumentsPageState extends State<DocumentsPage> {
                                   ),
                                   _data.toString().isNotEmpty &&
                                           _data.toString().contains('.pdf')
+                                      // ? SizedBox(
+                                      //     height: 90,
+                                      //     width: 90,
+                                      //     child: IconButton(
+                                      //         onPressed: (() => _showAttachment(
+                                      //             _data, false)),
+                                      //         icon: const Icon(
+                                      //           Icons.picture_as_pdf,
+                                      //           color: Colors.black,
+                                      //           size: 90,
+                                      //         )),
+                                      //   )
                                       ? SizedBox(
-                                          height: 90,
-                                          width: 90,
-                                          child: IconButton(
-                                              onPressed: (() => _showAttachment(
-                                                  _data, false)),
-                                              icon: const Icon(
-                                                Icons.picture_as_pdf,
-                                                color: Colors.black,
-                                                size: 90,
-                                              )),
-                                        )
+                                        height: 110,
+                                        // width: 120,
+                                        child: 
+                                            TextButton(
+                                              onPressed: (() =>
+                                                  _showAttachment(_data, false)),
+                                              child: 
+                                        Column(
+                                          crossAxisAlignment: CrossAxisAlignment.center,
+                                          mainAxisSize: MainAxisSize.min,
+                                          children: [
+                                            Image.asset(
+                                                'assets/images/pdf.png',
+                                                width: 65,
+                                                height: 65,
+                                              ),
+                                            const SizedBox(height: 5),
+                                            Text(attachmentName.toString().length > 15 ? attachmentName.substring(0, 15) : attachmentName, style: const TextStyle(fontSize: 15  , fontWeight: FontWeight.bold, color: Colors.grey)),
+                                          ],
+                                        ),
+                                        // IconButton(
+                                        //   onPressed: (() =>
+                                        //       _showAttachment(_data, false)),
+                                        //   icon: const Icon(
+                                        //     Icons.picture_as_pdf,
+                                        //     color: Colors.black,
+                                        //     size: 90,
+                                        //   ),
+                                        // ),
+                                      ))
                                       : Container(
                                           height: 90,
                                           width: 90,

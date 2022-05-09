@@ -51,7 +51,8 @@ class AuthenticationService {
             'phone': "",
             'email': email,
             'uid': _result.user?.uid,
-            'license': 0
+            'license': 0,
+            'experience': 0
           });
           _role.set({
             'uid': _result.user?.uid,

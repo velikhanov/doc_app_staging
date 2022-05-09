@@ -186,20 +186,21 @@ class DocPage extends StatelessWidget {
           .where('date', isGreaterThan: DateTime.now().millisecondsSinceEpoch)
           .get()
           .then((element) {
+            inspect(element.docs);
         for (var item in element.docs) {
-          itemsToday.removeWhere((element) => element.contains(
+          itemsToday.removeWhere((element) => item.data()['user_uid'] != FirebaseAuth.instance.currentUser!.uid && element.contains(
               DateFormat('yyyy-MM-dd HH:mm')
                   .format(DateTime.parse(
                       DateTime.fromMillisecondsSinceEpoch(item.data()['date'])
                           .toString()))
                   .toString()));
-          itemsTomorrow.removeWhere((element) => element.contains(
+          itemsTomorrow.removeWhere((element) => item.data()['user_uid'] != FirebaseAuth.instance.currentUser!.uid && element.contains(
               DateFormat('yyyy-MM-dd HH:mm')
                   .format(DateTime.parse(
                       DateTime.fromMillisecondsSinceEpoch(item.data()['date'])
                           .toString()))
                   .toString()));
-          itemsDayAfterTomorrow.removeWhere((element) => element.contains(
+          itemsDayAfterTomorrow.removeWhere((element) => item.data()['user_uid'] != FirebaseAuth.instance.currentUser!.uid && element.contains(
               DateFormat('yyyy-MM-dd HH:mm')
                   .format(DateTime.parse(
                       DateTime.fromMillisecondsSinceEpoch(item.data()['date'])
@@ -550,7 +551,7 @@ class DocPage extends StatelessWidget {
                                                   .millisecondsSinceEpoch)
                                       .get()
                                       .then((alreadyExists) async {
-                                    if (alreadyExists.size > 0 ||
+                                    if (alreadyExists.docs.where((element) => element.data()['user_uid'] == FirebaseAuth.instance.currentUser!.uid).toList().isEmpty && alreadyExists.size > 0 ||
                                         DateTime.parse(_result)
                                                 .millisecondsSinceEpoch <
                                             todaysDateCheck
@@ -614,7 +615,9 @@ class DocPage extends StatelessWidget {
                                               'name': docName,
                                               'category': docCategory,
                                               'doc_uid': docUid,
+                                              'user_uid': userUid,
                                               'role': 'p',
+                                              'details': "",
                                               'date': DateTime.parse(
                                                       _result + ':00')
                                                   .millisecondsSinceEpoch
@@ -647,8 +650,10 @@ class DocPage extends StatelessWidget {
                                                     .set({
                                                   'name': userName.docs.first
                                                       .data()['name'],
+                                                  'doc_uid': docUid,
                                                   'user_uid': userUid,
                                                   'role': 'd',
+                                                  'details': "",
                                                   'date': DateTime.parse(
                                                           _result + ':00')
                                                       .millisecondsSinceEpoch
@@ -848,12 +853,19 @@ class DocPage extends StatelessWidget {
                                 ],
                               ),
                               SizedBox(
-                                height: 20.0,
+                                height: 10.0,
                                 width: 150.0,
                                 child: Divider(
                                   color: Colors.teal.shade100,
                                 ),
                               ),
+                              // Visibility(
+                              //   visible: true,
+                              //   child: 
+                                Text('Опыт работы (лет): ' + (_data!['experience'] > 0 ? ((DateTime.now().difference(DateTime.parse(DateTime.fromMillisecondsSinceEpoch(_data['experience']).toString())).inDays)/365 < 1 ? 'Менее 1 года' : ((DateTime.now().difference(DateTime.parse(DateTime.fromMillisecondsSinceEpoch(_data['experience']).toString())).inDays)/365).round()).toString() : '-'), style: const TextStyle(fontWeight: FontWeight.bold),),
+                              // ),
+                              // const Text('Опыт работы: 28 лет'),
+                              const SizedBox(height: 10,),
                               Card(
                                 margin: const EdgeInsets.symmetric(
                                     vertical: 10.0, horizontal: 25.0),
@@ -863,8 +875,8 @@ class DocPage extends StatelessWidget {
                                     color: Colors.teal,
                                   ),
                                   title: Text(
-                                    _data?['phone'] == "" ?
-                                        /*'+(994) 55-555-55-55'*/ 'Номер не указан' : _data?['phone'],
+                                    _data['phone'] == "" ?
+                                        /*'+(994) 55-555-55-55'*/ 'Номер не указан' : _data['phone'],
                                     // '+90 506 922 92 21',
                                     style: TextStyle(
                                       fontSize: 20.0,
@@ -883,7 +895,7 @@ class DocPage extends StatelessWidget {
                                     color: Colors.teal,
                                   ),
                                   title: Text(
-                                    _data?['email'] ?? '',
+                                    _data['email'] ?? '',
                                     style: TextStyle(
                                       fontSize: 20.0,
                                       fontFamily: 'SourceSansPro',
@@ -901,7 +913,7 @@ class DocPage extends StatelessWidget {
                                       child: TextButton(
                                         onPressed: () {
                                           _createChatSession(
-                                              _data!['uid'],
+                                              _data['uid'],
                                               FirebaseAuth
                                                   .instance.currentUser!.uid);
                                           Navigator.push(
@@ -945,7 +957,7 @@ class DocPage extends StatelessWidget {
                                                   FirebaseAuth.instance
                                                       .currentUser!.uid)
                                               .where('doc_uid',
-                                                  isEqualTo: _data?['uid'])
+                                                  isEqualTo: _data['uid'])
                                               .get()
                                               .then((alreadyExists) {
                                             if (alreadyExists.size > 0) {
@@ -976,17 +988,17 @@ class DocPage extends StatelessWidget {
                                                     true);
                                               } else {
                                                 _showAvailableTime(
-                                                    _data?['name'],
-                                                    _data?['category'],
-                                                    _data?['uid'],
+                                                    _data['name'],
+                                                    _data['category'],
+                                                    _data['uid'],
                                                     FirebaseAuth.instance
                                                         .currentUser!.uid);
                                               }
                                             } else {
                                               _showAvailableTime(
-                                                  _data?['name'],
-                                                  _data?['category'],
-                                                  _data?['uid'],
+                                                  _data['name'],
+                                                  _data['category'],
+                                                  _data['uid'],
                                                   FirebaseAuth.instance
                                                       .currentUser!.uid);
                                             }

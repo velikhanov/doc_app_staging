@@ -3,6 +3,7 @@ import 'package:doc_app/pages/chats_page.dart';
 import 'package:doc_app/pages/doc_page.dart';
 import 'package:doc_app/api/get_data.dart';
 import 'package:doc_app/pages/documents.dart';
+import 'package:doc_app/pages/patient_history.dart';
 import 'package:doc_app/pages/reminder.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
@@ -81,7 +82,7 @@ class _HomeTabsState extends State<HomeTabs> with TickerProviderStateMixin {
               ),
               Tab(
                 icon: Icon(Icons.event_note),
-                text: 'История',
+                text: 'Записи',
               ),
               Tab(
                 icon: Icon(Icons.calendar_today),
@@ -224,7 +225,18 @@ class _HomeTabsState extends State<HomeTabs> with TickerProviderStateMixin {
                                                   builder: (context) =>
                                                       const DocumentsPage()),
                                             );
-                                          } else {
+                                          } else if(data['is_nestedcat'] !=
+                                                  null &&
+                                              data['is_nestedcat'] == false &&
+                                              data['id_category'].toInt() ==
+                                                  4) {
+                                            Navigator.push(
+                                              context,
+                                              MaterialPageRoute(
+                                                  builder: (context) =>
+                                                      const PatientHistoryPage()),
+                                            );
+                                          }else {
                                             null;
                                           }
                                         },

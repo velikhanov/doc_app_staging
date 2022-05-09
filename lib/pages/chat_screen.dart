@@ -79,7 +79,7 @@ class _ChatScreenState extends State<ChatScreen> {
         });
   }
 
-  _chatBubble(String message, attachment, time, bool isMe, bool isSameUser,
+  _chatBubble(String message, attachment, String attachmentName, time, bool isMe, bool isSameUser,
       bool firstMessage, bool isImg, bool isDocument) {
     if (isMe) {
       return Column(
@@ -131,9 +131,11 @@ class _ChatScreenState extends State<ChatScreen> {
                               height: 2.5,
                             ),
                             isImg == true && isDocument == false
-                                ? Container(
+                                ? Padding(
+                                  padding: const EdgeInsets.only(right: 15),
+                                  child: Container(
                                     height: 90,
-                                    width: 90,
+                                    // width: 90,
                                     decoration: BoxDecoration(
                                       color: Colors.transparent,
                                       image: DecorationImage(
@@ -145,21 +147,36 @@ class _ChatScreenState extends State<ChatScreen> {
                                           _showAttachment(_data, true)),
                                       child: const SizedBox(),
                                     ),
-                                  )
+                                  ),
+                                )
                                 : isImg == false && isDocument == true
                                     ? SizedBox(
-                                        height: 90,
-                                        width: 90,
-                                        child: IconButton(
-                                          onPressed: (() =>
-                                              _showAttachment(_data, false)),
-                                          icon: const Icon(
-                                            Icons.picture_as_pdf,
-                                            color: Colors.black,
-                                            size: 90,
-                                          ),
-                                        ),
-                                      )
+                                        height: 110,
+                                        // width: 120,
+                                        child: 
+                                            TextButton(
+                                              onPressed: (() =>
+                                                  _showAttachment(_data, false)),
+                                              // icon: const Icon(
+                                              //   Icons.picture_as_pdf,
+                                              //   color: Colors.black,
+                                              //   size: 90,
+                                              // ),
+                                              child: 
+                                                Column(
+                                                  crossAxisAlignment: CrossAxisAlignment.center,
+                                                  mainAxisSize: MainAxisSize.min,
+                                                  children: [
+                                                    Image.asset(
+                                                        'assets/images/pdf.png',
+                                                        width: 65,
+                                                        height: 65,
+                                                      ),
+                                                    const SizedBox(height: 5),
+                                                    Text(attachmentName.toString().length > 15 ? attachmentName.substring(0, 15) : attachmentName, style: const TextStyle(fontSize: 15  , fontWeight: FontWeight.bold, color: Colors.grey)),
+                                                  ],
+                                                ),
+                                      ))
                                     : const SizedBox(),
                             const SizedBox(
                               height: 2.5,
@@ -209,37 +226,40 @@ class _ChatScreenState extends State<ChatScreen> {
                   ),
           ),
           !isSameUser || firstMessage
-              ? Row(
-                  mainAxisAlignment: MainAxisAlignment.end,
-                  children: <Widget>[
-                    Text(
-                      time,
-                      style: const TextStyle(
-                          fontSize: 12,
-                          color: Colors.black45,
-                          fontWeight: FontWeight.bold),
-                    ),
-                    const SizedBox(
-                      width: 10,
-                    ),
-                    Container(
-                      decoration: BoxDecoration(
-                        shape: BoxShape.circle,
-                        boxShadow: [
-                          BoxShadow(
-                            color: Colors.grey.withOpacity(0.5),
-                            spreadRadius: 2,
-                            blurRadius: 5,
-                          ),
-                        ],
+              ? Padding(
+                  padding: const EdgeInsets.only(top: 10),
+                  child: Row(
+                    mainAxisAlignment: MainAxisAlignment.end,
+                    children: <Widget>[
+                      Text(
+                        time,
+                        style: const TextStyle(
+                            fontSize: 12,
+                            color: Colors.black45,
+                            fontWeight: FontWeight.bold),
                       ),
-                      child: const CircleAvatar(
-                        radius: 15,
-                        backgroundImage:
-                            AssetImage('assets/images/home_img.png'),
+                      const SizedBox(
+                        width: 10,
                       ),
-                    ),
-                  ],
+                      Container(
+                        decoration: BoxDecoration(
+                          shape: BoxShape.circle,
+                          boxShadow: [
+                            BoxShadow(
+                              color: Colors.grey.withOpacity(0.5),
+                              spreadRadius: 2,
+                              blurRadius: 5,
+                            ),
+                          ],
+                        ),
+                        child: const CircleAvatar(
+                          radius: 15,
+                          backgroundImage:
+                              AssetImage('assets/images/home_img.png'),
+                        ),
+                      ),
+                    ],
+                  ),
                 )
               : Container(
                   child: null,
@@ -296,35 +316,61 @@ class _ChatScreenState extends State<ChatScreen> {
                               height: 2.5,
                             ),
                             isImg == true && isDocument == false
-                                ? Container(
-                                    height: 90,
-                                    width: 90,
-                                    decoration: BoxDecoration(
-                                      color: Colors.transparent,
-                                      image: DecorationImage(
-                                          image: NetworkImage(_data),
-                                          fit: BoxFit.cover),
-                                    ),
-                                    child: TextButton(
-                                      onPressed: (() =>
-                                          _showAttachment(_data, true)),
-                                      child: const SizedBox(),
+                                ? Padding(
+                                    padding: const EdgeInsets.only(left: 15),
+                                    child: Container(
+                                      height: 90,
+                                      // width: 90,
+                                      decoration: BoxDecoration(
+                                        color: Colors.transparent,
+                                        image: DecorationImage(
+                                            image: NetworkImage(_data),
+                                            fit: BoxFit.cover),
+                                      ),
+                                      child: TextButton(
+                                        onPressed: (() =>
+                                            _showAttachment(_data, true)),
+                                        child: const SizedBox(),
+                                      ),
                                     ),
                                   )
                                 : isImg == false && isDocument == true
                                     ? SizedBox(
-                                        height: 90,
-                                        width: 90,
-                                        child: IconButton(
-                                          onPressed: (() =>
-                                              _showAttachment(_data, false)),
-                                          icon: const Icon(
-                                            Icons.picture_as_pdf,
-                                            color: Colors.black,
-                                            size: 90,
-                                          ),
+                                        height: 110,
+                                        // width: 120,
+                                        child: 
+                                            TextButton(
+                                              onPressed: (() =>
+                                                  _showAttachment(_data, false)),
+                                              // icon: const Icon(
+                                              //   Icons.picture_as_pdf,
+                                              //   color: Colors.black,
+                                              //   size: 90,
+                                              // ),
+                                              child: 
+                                        Column(
+                                          crossAxisAlignment: CrossAxisAlignment.center,
+                                          mainAxisSize: MainAxisSize.min,
+                                          children: [
+                                            Image.asset(
+                                                'assets/images/pdf.png',
+                                                width: 65,
+                                                height: 65,
+                                              ),
+                                            const SizedBox(height: 5),
+                                            Text(attachmentName.toString().length > 15 ? attachmentName.substring(0, 15) : attachmentName, style: const TextStyle(fontSize: 15  , fontWeight: FontWeight.bold, color: Colors.grey)),
+                                          ],
                                         ),
-                                      )
+                                        // IconButton(
+                                        //   onPressed: (() =>
+                                        //       _showAttachment(_data, false)),
+                                        //   icon: const Icon(
+                                        //     Icons.picture_as_pdf,
+                                        //     color: Colors.black,
+                                        //     size: 90,
+                                        //   ),
+                                        // ),
+                                      ))
                                     : const SizedBox(),
                             const SizedBox(
                               height: 2.5,
@@ -374,36 +420,39 @@ class _ChatScreenState extends State<ChatScreen> {
                   ),
           ),
           !isSameUser || firstMessage
-              ? Row(
-                  children: <Widget>[
-                    Container(
-                      decoration: BoxDecoration(
-                        shape: BoxShape.circle,
-                        boxShadow: [
-                          BoxShadow(
-                            color: Colors.grey.withOpacity(0.5),
-                            spreadRadius: 2,
-                            blurRadius: 5,
-                          ),
-                        ],
+                ? Padding(
+                  padding: const EdgeInsets.only(top: 10),
+                  child: Row(
+                    children: <Widget>[
+                      Container(
+                        decoration: BoxDecoration(
+                          shape: BoxShape.circle,
+                          boxShadow: [
+                            BoxShadow(
+                              color: Colors.grey.withOpacity(0.5),
+                              spreadRadius: 2,
+                              blurRadius: 5,
+                            ),
+                          ],
+                        ),
+                        child: const CircleAvatar(
+                          radius: 15,
+                          backgroundImage:
+                              AssetImage('assets/images/home_img.png'),
+                        ),
                       ),
-                      child: const CircleAvatar(
-                        radius: 15,
-                        backgroundImage:
-                            AssetImage('assets/images/home_img.png'),
+                      const SizedBox(
+                        width: 10,
                       ),
-                    ),
-                    const SizedBox(
-                      width: 10,
-                    ),
-                    Text(
-                      time,
-                      style: const TextStyle(
-                        fontSize: 12,
-                        color: Colors.black45,
+                      Text(
+                        time,
+                        style: const TextStyle(
+                          fontSize: 12,
+                          color: Colors.black45,
+                        ),
                       ),
-                    ),
-                  ],
+                    ],
+                  ),
                 )
               : Container(
                   child: null,
@@ -823,6 +872,7 @@ class _ChatScreenState extends State<ChatScreen> {
                             prevUserId =
                                 snapshot.data!.docs[prevIndex]['sender'];
                             bool firstMessage = index == 0;
+                            String attachmentName = _data['attachment'];
                             final bool isSameUser =
                                 prevUserId == _data['sender'];
                             if (_data['attachment'].toString().isNotEmpty) {
@@ -853,6 +903,7 @@ class _ChatScreenState extends State<ChatScreen> {
                                           widget.userId +
                                           '/' +
                                           _data['attachment']),
+                                  attachmentName,
                                   time,
                                   isMe,
                                   isSameUser,
@@ -860,7 +911,7 @@ class _ChatScreenState extends State<ChatScreen> {
                                   isImg,
                                   isDocument);
                             } else {
-                              return _chatBubble(message, '', time, isMe,
+                              return _chatBubble(message, '', '', time, isMe,
                                   isSameUser, firstMessage, false, false);
                             }
                           });

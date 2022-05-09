@@ -1,3 +1,5 @@
+import 'dart:developer';
+
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 
@@ -82,28 +84,79 @@ getUserRole(String _collection) {
 }
 
 // Get visit history list
-getPlannedVisits(String _currentUser) async {
+getPlannedVisits(String _currentUser, {bool returnAll = false, bool firstPage = false, String? docUid}) async {
+
   QuerySnapshot<Map<String, dynamic>> _userRole = await FirebaseFirestore
-      .instance
-      .collection('roles')
-      .where('uid', isEqualTo: _currentUser)
-      .get();
+    .instance
+    .collection('roles')
+    .where('uid', isEqualTo: _currentUser)
+    .get();
 
   for (QueryDocumentSnapshot<Map<String, dynamic>> element in _userRole.docs) {
     if (element.data()['role'] == 'p') {
-      QuerySnapshot<Map<String, dynamic>> _snapshot = await FirebaseFirestore
+      if(returnAll == true){
+        List _checkList = [];
+        List _finalList = [];
+        QuerySnapshot<Map<String, dynamic>> _snapshot = await FirebaseFirestore
+          .instance
+          .collection('planned_visits/' + _currentUser + '/' + _currentUser)
+          .orderBy('date', descending: firstPage == true ? true : false)
+          .get();
+          if(firstPage == true){
+            for (var item in _snapshot.docs) {
+              if(!_checkList.contains(item.data()['name'] + '-' + item.data()['category'])){
+                _checkList.add(item.data()['name'] + '-' + item.data()['category']);
+                _finalList.add(item);
+              }
+            }
+            return _finalList;
+          }else if(firstPage == false && docUid!.isNotEmpty){
+            return await FirebaseFirestore
+              .instance
+              .collection('planned_visits/' + _currentUser + '/' + _currentUser)
+              .where('doc_uid', isEqualTo: docUid)
+              .get();
+          }
+      }else{
+        QuerySnapshot<Map<String, dynamic>> _snapshot = await FirebaseFirestore
           .instance
           .collection('planned_visits/' + _currentUser + '/' + _currentUser)
           .where('date', isGreaterThan: DateTime.now().millisecondsSinceEpoch)
           .get();
-      return _snapshot;
+        return _snapshot;
+      }
     } else if (element.data()['role'] == 'd') {
-      QuerySnapshot<Map<String, dynamic>> _snapshot = await FirebaseFirestore
-          .instance
-          .collection('appointments/' + _currentUser + '/' + _currentUser)
-          .where('date', isGreaterThan: DateTime.now().millisecondsSinceEpoch)
-          .get();
-      return _snapshot;
+      if(returnAll == true){
+        List _checkList = [];
+        List _finalList = [];
+        QuerySnapshot<Map<String, dynamic>> _snapshot = await FirebaseFirestore
+            .instance
+            .collection('appointments/' + _currentUser + '/' + _currentUser)
+            .orderBy('date')
+            .get();
+          if(firstPage == true){
+            for (var item in _snapshot.docs) {
+              if(!_checkList.contains(item.data()['name'])){
+                _checkList.add(item.data()['name']);
+                _finalList.add(item);
+              }
+            }
+            return _finalList;
+          }else if(firstPage == false && docUid!.isNotEmpty){
+            return await FirebaseFirestore
+              .instance
+              .collection('appointments/' + _currentUser + '/' + _currentUser)
+              .where('user_uid', isEqualTo: docUid)
+              .get();
+          }
+      }else{
+        QuerySnapshot<Map<String, dynamic>> _snapshot = await FirebaseFirestore
+            .instance
+            .collection('appointments/' + _currentUser + '/' + _currentUser)
+            .where('date', isGreaterThan: DateTime.now().millisecondsSinceEpoch)
+            .get();
+        return _snapshot;
+      }
     }
   }
 }
@@ -127,7 +180,7 @@ getChatMessages(String _collection) {
 }
 
 // All patient/doctor chats
-getChats(String _collection, String uid) async {
+getChats(String _collection, String uid) async { 
   QuerySnapshot<Map<String, dynamic>> _userRole = await FirebaseFirestore
       .instance
       .collection('roles')
