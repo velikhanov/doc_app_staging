@@ -37,7 +37,7 @@ class _PatientHistoryPageState extends State<PatientHistoryPage> {
     });
   }
   TextEditingController detailsController = TextEditingController();
-  Future<void> _showDetails(BuildContext context, int _date) async {
+  Future<void> _showDetails(BuildContext context, int _date, {String? userId}) async {
       if(isDoc == true){
         FirebaseFirestore.instance
         .collection('appointments/' + FirebaseAuth.instance.currentUser!.uid + '/' + FirebaseAuth.instance.currentUser!.uid)
@@ -98,30 +98,31 @@ class _PatientHistoryPageState extends State<PatientHistoryPage> {
                       Visibility(
                         visible: isDoc == true ? true : false,
                         child: TextButton(
-                          onPressed: (){
+                          onPressed: () async {
 
-                            FirebaseFirestore.instance
+                            await FirebaseFirestore.instance
                             .collection('appointments/' + FirebaseAuth.instance.currentUser!.uid + '/' + FirebaseAuth.instance.currentUser!.uid)
-                            .where('date', isEqualTo: _date).get().then((value){
-                              FirebaseFirestore.instance
+                            .where('date', isEqualTo: _date).get().then((value) async{
+                              await FirebaseFirestore.instance
                               .collection('appointments/' + FirebaseAuth.instance.currentUser!.uid + '/' + FirebaseAuth.instance.currentUser!.uid)
                               .doc(value.docs[0].id)
                               .update({
                                 "details": detailsController.text
                               });
-                            });
-
-                            FirebaseFirestore.instance
-                            .collection('planned_visits/' + FirebaseAuth.instance.currentUser!.uid + '/' + FirebaseAuth.instance.currentUser!.uid)
-                            .where('date', isEqualTo: _date).get().then((value){
-                              FirebaseFirestore.instance
-                              .collection('planned_visits/' + FirebaseAuth.instance.currentUser!.uid + '/' + FirebaseAuth.instance.currentUser!.uid)
-                              .doc(value.docs[0].id)
-                              .update({
-                                "details": detailsController.text
+                            }).then((value) async{
+                              await FirebaseFirestore.instance
+                              .collection('planned_visits/' + userId! + '/' + userId)
+                              .where('date', isEqualTo: _date).get().then((value) async{
+                                await FirebaseFirestore.instance
+                                .collection('planned_visits/' + userId + '/' + userId)
+                                .doc(value.docs[0].id)
+                                .update({
+                                  "details": detailsController.text
+                                });
                               });
+                            }).then((value) {
+                              Navigator.of(detailContext).pop();
                             });
-
                           },
                           style: ButtonStyle(
                             backgroundColor:
@@ -386,7 +387,7 @@ class _PatientHistoryPageState extends State<PatientHistoryPage> {
                         return Card(
                           color: const Color.fromARGB(255, 152, 215, 225),
                           child: ListTile(
-                            onTap: () => _showDetails(context, _data['date']),
+                            onTap: () => _showDetails(context, _data['date'], userId: _data['user_uid']),
                             title: Text('У вас было посещение: ' + DateFormat('dd/MM/yyyy').format(DateTime.fromMillisecondsSinceEpoch(_data['date'])).toString(),  
                                 style: const TextStyle(
                                     fontWeight: FontWeight.bold)),
