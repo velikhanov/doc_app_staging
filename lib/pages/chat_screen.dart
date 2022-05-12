@@ -438,7 +438,7 @@ class _ChatScreenState extends State<ChatScreen> {
                         child: const CircleAvatar(
                           radius: 15,
                           backgroundImage:
-                              AssetImage('assets/images/home_img.png'),
+                              AssetImage('assets/images/user.png'),
                         ),
                       ),
                       const SizedBox(

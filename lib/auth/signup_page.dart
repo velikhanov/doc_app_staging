@@ -239,12 +239,12 @@ class _SignUpPageContent extends State<SignUpPageContent> {
             mainAxisAlignment: MainAxisAlignment.center,
             children: [
               isdoc == true
-                  ? const Text('Я врач',
+                  ? const Text('Врач',
                       style: TextStyle(
                         color: Colors.white,
                         fontSize: 17.5,
                       ))
-                  : const Text('Я пациент',
+                  : const Text('Пациент',
                       style: TextStyle(
                         color: Colors.white,
                         fontSize: 17.5,

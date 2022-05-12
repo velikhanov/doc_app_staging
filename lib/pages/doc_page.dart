@@ -100,7 +100,7 @@ class DocPage extends StatelessWidget {
       );
     }
 
-    Future _showAvailableTime(String docName, String docCategory, String docUid,
+    Future _showAvailableTime(String docEmail, String docCategory, String docUid,
         String userUid) async {
       var todaysDate = DateFormat('yyyy-MM-dd hh:mm:ss').format(DateTime(
           DateTime.now().year,
@@ -186,7 +186,6 @@ class DocPage extends StatelessWidget {
           .where('date', isGreaterThan: DateTime.now().millisecondsSinceEpoch)
           .get()
           .then((element) {
-            inspect(element.docs);
         for (var item in element.docs) {
           itemsToday.removeWhere((element) => item.data()['user_uid'] != FirebaseAuth.instance.currentUser!.uid && element.contains(
               DateFormat('yyyy-MM-dd HH:mm')
@@ -526,12 +525,14 @@ class DocPage extends StatelessWidget {
                             mainAxisAlignment: MainAxisAlignment.spaceAround,
                             children: [
                               TextButton(
-                                onPressed: (() => Navigator.push(
-                                    context,
+                                onPressed: (){
+                                  Navigator.push(
+                                    buildContext,
                                     MaterialPageRoute(
-                                      builder: (context) =>
+                                      builder: (buildContext) =>
                                           DocPage(_collection, _id),
-                                    ))),
+                                    ));
+                                },
                                 child: const Text('Закрыть',
                                     style: TextStyle(
                                         fontSize: 20,
@@ -561,7 +562,7 @@ class DocPage extends StatelessWidget {
                                               'Похоже это время уже занято либо более недоступно',
                                               false)
                                           .then((value) async {
-                                        await _showAvailableTime(docName,
+                                        await _showAvailableTime(docEmail,
                                             docCategory, docUid, userUid);
                                       });
                                     } else {
@@ -612,7 +613,7 @@ class DocPage extends StatelessWidget {
                                                     userUid)
                                                 .doc(newPlannedId.toString())
                                                 .set({
-                                              'name': docName,
+                                              'email': docEmail,
                                               'category': docCategory,
                                               'doc_uid': docUid,
                                               'user_uid': userUid,
@@ -648,8 +649,8 @@ class DocPage extends StatelessWidget {
                                                     .doc(
                                                         newAppointId.toString())
                                                     .set({
-                                                  'name': userName.docs.first
-                                                      .data()['name'],
+                                                  'email': userName.docs.first
+                                                      .data()['email'],
                                                   'doc_uid': docUid,
                                                   'user_uid': userUid,
                                                   'role': 'd',
@@ -988,7 +989,8 @@ class DocPage extends StatelessWidget {
                                                     true);
                                               } else {
                                                 _showAvailableTime(
-                                                    _data['name'],
+                                                    // _data['name'],
+                                                    _data['email'],
                                                     _data['category'],
                                                     _data['uid'],
                                                     FirebaseAuth.instance
@@ -996,7 +998,8 @@ class DocPage extends StatelessWidget {
                                               }
                                             } else {
                                               _showAvailableTime(
-                                                  _data['name'],
+                                                  // _data['name'],
+                                                  _data['email'],
                                                   _data['category'],
                                                   _data['uid'],
                                                   FirebaseAuth.instance

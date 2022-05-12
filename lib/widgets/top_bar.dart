@@ -387,7 +387,7 @@ class _TopBarState extends State<TopBar> {
                 Column(
                   children: <Widget>[
                     Image.asset(
-                      'assets/images/user.png',
+                      'assets/images/home_img.png',
                       width: 75,
                     ),
                     Text(

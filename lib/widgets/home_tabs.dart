@@ -1,3 +1,5 @@
+import 'dart:developer';
+
 import 'package:doc_app/pages/calendar_page.dart';
 import 'package:doc_app/pages/chats_page.dart';
 import 'package:doc_app/pages/doc_page.dart';
@@ -21,6 +23,7 @@ class HomeTabs extends StatefulWidget {
 
 class _HomeTabsState extends State<HomeTabs> with TickerProviderStateMixin {
   var _category = getCategoryData('categories');
+  bool isDoc = false;
   final Future<dynamic>? _plannedVisits =
       getPlannedVisits(FirebaseAuth.instance.currentUser!.uid);
   final List<String> _stack = ['categories'];
@@ -36,6 +39,17 @@ class _HomeTabsState extends State<HomeTabs> with TickerProviderStateMixin {
         _displayBack = true;
       });
     }
+    FirebaseFirestore.instance
+        .collection('roles')
+        .where('uid', isEqualTo: FirebaseAuth.instance.currentUser!.uid)
+        .get()
+        .then((e) {
+      if (e.docs[0].data()['role'] == 'p') {
+        isDoc = false;
+      } else if (e.docs[0].data()['role'] == 'd') {
+        isDoc = true;
+      }
+    });
   }
 
   void _initCategories(String _newCategory) {
@@ -459,29 +473,38 @@ class _HomeTabsState extends State<HomeTabs> with TickerProviderStateMixin {
                       }
 
                       if (snapshot.hasData) {
-                        if (snapshot.data!.docs.isNotEmpty &&
-                            (snapshot.data!.docs[0].data()['name'] != null)) {
+                        if (snapshot.data!.length > 0 &&
+                            (snapshot.data![0].data()['email'] != null)) {
                           return ListView.separated(
                               separatorBuilder:
                                   (BuildContext context, int index) =>
                                       const SizedBox(),
-                              itemCount: snapshot.data.size,
+                              itemCount: snapshot.data!.length,
                               itemBuilder: (context, index) {
-                                var _data = snapshot.data!.docs[index].data();
+                                var _data = snapshot.data![index].data();
                                 return Card(
                                     color:
                                         const Color.fromARGB(255, 0, 115, 153),
                                     child: ListTile(
+                                        onTap: (){
+                                          Navigator.push(
+                                            context,
+                                            MaterialPageRoute(
+                                              builder: (context) => PatientHistoryPage(uid: isDoc == true ? _data['user_uid'] : _data['doc_uid']),
+                                            ),
+                                          );
+                                        },
                                         title: Text(
-                                            ((_data['role'] == 'p')
-                                                ? (_data['category'] +
-                                                    ' - ' +
-                                                    _data['name'])
-                                                : _data['name']),
+                                            // ((_data['role'] == 'p')
+                                            //     ? (_data['category'] +
+                                            //         ' - ' +
+                                            //         _data['name'])
+                                            //     : _data['name']),
+                                            _data['email'],
                                             style: const TextStyle(
                                                 fontWeight: FontWeight.bold)),
                                         subtitle: Text(
-                                            DateFormat('yyyy-MM-dd HH:mm')
+                                            DateFormat('dd-MM-yyyy HH:mm')
                                                 .format(DateTime.parse(
                                                     DateTime.fromMillisecondsSinceEpoch(_data['date'])
                                                         .toString()))
@@ -534,6 +557,7 @@ class _HomeTabsState extends State<HomeTabs> with TickerProviderStateMixin {
                           // ),
                         );
                       }
+                      return const Text('s');
                     }),
                 floatingActionButton: FloatingActionButton(
                   onPressed: (() {

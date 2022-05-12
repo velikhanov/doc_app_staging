@@ -8,7 +8,8 @@ import 'package:flutter/material.dart';
 import 'package:intl/intl.dart';
 
 class PatientHistoryPage extends StatefulWidget {
-  const PatientHistoryPage({Key? key}) : super(key: key);
+  final String? uid;
+  const PatientHistoryPage({this.uid, Key? key}) : super(key: key);
 
   @override
   State<PatientHistoryPage> createState() => _PatientHistoryPageState();
@@ -18,12 +19,21 @@ class _PatientHistoryPageState extends State<PatientHistoryPage> {
   int _routeStack = 0;
   String? _name;
   bool _isFirstPage = true;
-  var _userHistory = getPlannedVisits(FirebaseAuth.instance.currentUser!.uid, returnAll: true, firstPage: true);
+  dynamic _userHistory;
 
   bool isDoc = false;
   @override
   void initState() {
     super.initState();
+    if(widget.uid != null){
+      _userHistory = getPlannedVisits(FirebaseAuth.instance.currentUser!.uid, returnAll: true, firstPage: false, docUid: widget.uid);
+      _routeStack++;
+      _isFirstPage = false;
+    }else{
+      _userHistory = getPlannedVisits(FirebaseAuth.instance.currentUser!.uid, returnAll: true, firstPage: true);
+      _routeStack = 0;
+      _isFirstPage = true;
+    }
     FirebaseFirestore.instance
         .collection('roles')
         .where('uid', isEqualTo: FirebaseAuth.instance.currentUser!.uid)
@@ -120,9 +130,10 @@ class _PatientHistoryPageState extends State<PatientHistoryPage> {
                                   "details": detailsController.text
                                 });
                               });
-                            }).then((value) {
-                              Navigator.of(detailContext).pop();
                             });
+                            // then((value) {
+                              Navigator.of(detailContext).pop();
+                            // });
                           },
                           style: ButtonStyle(
                             backgroundColor:
@@ -359,36 +370,41 @@ class _PatientHistoryPageState extends State<PatientHistoryPage> {
                             onTap: (() => setState(() {
                                   _isFirstPage = false;
                                   _userHistory = getPlannedVisits(FirebaseAuth.instance.currentUser!.uid, returnAll: true, firstPage: false, docUid: isDoc == true ? _data['user_uid'] : _data['doc_uid']);
-                                  _name = isDoc == true ? _data['name'] : _data['name'] + ' - ' + _data['category'];
+                                  // _name = isDoc == true ? _data['name'] : _data['name'] + ' - ' + _data['category'];
+                                  _name = _data['email'];
                                   _routeStack++;
                                 })),
-                            title: Text(isDoc == true ? _data['name'] : _data['name'] + ' - ' + _data['category'],
+                            // title: Text(isDoc == true ? _data['name'] : _data['name'] + ' - ' + _data['category'],
+                            title: Text(_data['email'],
                                 style: const TextStyle(
                                     fontWeight: FontWeight.bold)),
-                            subtitle: Text('Последнее посещение: ' + DateFormat('dd/MM/yyyy').format(DateTime.fromMillisecondsSinceEpoch(_data['date'])).toString(), style: const TextStyle(fontWeight: FontWeight.bold)),
+                            subtitle: Text((DateTime.now().millisecondsSinceEpoch > _data['date'] ? 'Последнее' : 'Запланир.') + ' посещение: ' + DateFormat('dd/MM/yyyy').format(DateTime.fromMillisecondsSinceEpoch(_data['date'])).toString(), style: const TextStyle(fontWeight: FontWeight.bold)),
                             leading: const CircleAvatar(
                                 backgroundImage:
                                     AssetImage('assets/images/history2.png')),
                             // trailing: Icon(Icons.access_time_filled, color: Colors.black,)));
                             trailing: const Icon(
-                              Icons.document_scanner,
+                              Icons.file_open,
                               color: Colors.black,
                             ),
                           ),
                         );
                       });
-                  }  else if (_isFirstPage == false && snapshot.data.size > 0) {
+                  // } else if (_isFirstPage == false && snapshot.data.size > 0) {
+                  } else if (_isFirstPage == false && snapshot.data.length > 0) {
                     return ListView.separated(
                       separatorBuilder: (BuildContext context, int index) =>
                           const SizedBox(),
-                      itemCount: snapshot.data.size,
+                      // itemCount: snapshot.data.size,
+                      itemCount: snapshot.data.length,
                       itemBuilder: (context, index) {
-                        var _data = snapshot.data!.docs[index].data();
+                        // var _data = snapshot.data!.docs[index].data();
+                        var _data = snapshot.data![index].data();
                         return Card(
                           color: const Color.fromARGB(255, 152, 215, 225),
                           child: ListTile(
                             onTap: () => _showDetails(context, _data['date'], userId: _data['user_uid']),
-                            title: Text('У вас было посещение: ' + DateFormat('dd/MM/yyyy').format(DateTime.fromMillisecondsSinceEpoch(_data['date'])).toString(),  
+                            title: Text((DateTime.now().millisecondsSinceEpoch > _data['date'] ? 'Прошедшее' : 'Запланир.') + ' посещение: ' + DateFormat('dd/MM/yyyy').format(DateTime.fromMillisecondsSinceEpoch(_data['date'])).toString(),  
                                 style: const TextStyle(
                                     fontWeight: FontWeight.bold)),
                             subtitle: const Text('Нажмите, чтобы посмотреть детали', style: TextStyle(fontWeight: FontWeight.bold),),

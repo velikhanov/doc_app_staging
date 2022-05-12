@@ -1,5 +1,3 @@
-import 'dart:developer';
-
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:doc_app/api/get_data.dart';
 import 'package:doc_app/api/storage_service.dart';
