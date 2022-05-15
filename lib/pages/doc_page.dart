@@ -62,40 +62,78 @@ class DocPage extends StatelessWidget {
     showAlertDialog(
         BuildContext alertContext, String message, bool isSuccess) async {
       // set up the button
-      Widget okButton = TextButton(
-        child: const Text('Закрыть',
-            style: TextStyle(fontSize: 20, fontWeight: FontWeight.bold),
-            textAlign: TextAlign.center),
-        onPressed: () {
-          if (isSuccess == true) {
-            // inspect('s');
-            Navigator.push(
-                context,
-                MaterialPageRoute(
-                  builder: (alertContext) => DocPage(_collection, _id),
-                ));
-            // Navigator.of(alertContext)..pop()..pop();
-          } else {
-            Navigator.of(alertContext).pop();
-          }
-        },
-      );
+      // Widget okButton = TextButton(
+      //   child: const Text('Закрыть',
+      //       style: TextStyle(fontSize: 20, fontWeight: FontWeight.bold),
+      //       textAlign: TextAlign.center),
+      //   onPressed: () {
+      //     if (isSuccess == true) {
+      //       Navigator.push(
+      //           alertContext,
+      //           MaterialPageRoute(
+      //             builder: (alertContext) => DocPage(_collection, _id),
+      //           ));
+      //       // Navigator.of(alertContext)..pop()..pop();
+      //     } else {
+      //       Navigator.of(alertContext).pop();
+      //     }
+      //   },
+      // );
 
       // set up the AlertDialog
-      AlertDialog alert = AlertDialog(
-        content: Text(message,
-            style: const TextStyle(fontSize: 20, fontWeight: FontWeight.bold),
-            textAlign: TextAlign.center),
-        actions: [
-          okButton,
-        ],
-      );
+      // AlertDialog alert = AlertDialog(
+      //   content: Text(message,
+      //       style: const TextStyle(fontSize: 20, fontWeight: FontWeight.bold),
+      //       textAlign: TextAlign.center),
+      //   actions: [
+      //     TextButton(
+      //       child: const Text('Закрыть',
+      //           style: TextStyle(fontSize: 20, fontWeight: FontWeight.bold),
+      //           textAlign: TextAlign.center),
+      //       onPressed: () {
+      //         if (isSuccess == true) {
+      //           Navigator.push(
+      //               alertContext,
+      //               MaterialPageRoute(
+      //                 builder: (alertContext) => DocPage(_collection, _id),
+      //               ));
+      //           // Navigator.of(alertContext)..pop()..pop();
+      //         } else {
+      //           Navigator.of(alertContext).pop();
+      //         }
+      //       },
+      //     ),
+      //   ],
+      // );
 
       // show the dialog
       return await showDialog(
         context: alertContext,
-        builder: (BuildContext alertContext) {
-          return alert;
+        builder: (BuildContext alertContext2) {
+          return AlertDialog(
+            content: Text(message,
+                style: const TextStyle(fontSize: 20, fontWeight: FontWeight.bold),
+                textAlign: TextAlign.center),
+            actions: [
+              TextButton(
+                child: const Text('Закрыть',
+                    style: TextStyle(fontSize: 20, fontWeight: FontWeight.bold),
+                    textAlign: TextAlign.center),
+                onPressed: () {
+                  if (isSuccess == true) {
+                    Navigator.push(
+                        alertContext2,
+                        MaterialPageRoute(
+                          builder: (alertContext3) => DocPage(_collection, _id),
+                        ));
+                    // Navigator.of(alertContext)..pop()..pop();
+                  } else {
+                    Navigator.of(alertContext2).pop();
+                  }
+                },
+              ),
+            ],
+          );
         },
       );
     }

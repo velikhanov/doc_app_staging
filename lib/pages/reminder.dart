@@ -1,4 +1,5 @@
 import 'dart:async';
+import 'dart:developer';
 import 'package:awesome_notifications/awesome_notifications.dart';
 import 'package:doc_app/api/reminder_service.dart';
 import 'package:intl/intl.dart';
@@ -198,7 +199,7 @@ class _ReminderPageState extends State<ReminderPage> {
                                 child: Text(
                                   (time.hour.toString() == '0'
                                           ? '00'
-                                          : time.hour.toString()) +
+                                          : (time.hour.toString().length < 2 ? '0' + time.hour.toString() : time.hour.toString())) +
                                       ':' +
                                       (time.minute.toString().length < 2
                                           ? '0' + time.minute.toString()
@@ -282,8 +283,14 @@ class _ReminderPageState extends State<ReminderPage> {
                               TextButton(
                               onPressed: () async{
                                 var jsonResult = await Reminder().readJson();
-                                  String notifyTime = (time.hour.toString() == '0' ? '00': time.hour.toString()) + ':' +(time.minute.toString().length < 2 ? '0' + time.minute.toString(): time.minute.toString());
+                                if(jsonResult['count'] == null){
+                                  await Reminder().createJson();
+                                  jsonResult = await Reminder().readJson();
+                                }
+                                  String notifyTime = (time.hour.toString() == '0' ? '00' : (time.hour.toString().length < 2 ? '0' + time.hour.toString() : time.hour.toString())) + ':' +(time.minute.toString().length < 2 ? '0' + time.minute.toString(): time.minute.toString());
                                   DateTime timeNow = DateTime.parse(DateTime.now().year.toString() + '-' + (DateTime.now().month.toString().length < 2 ? '0' + DateTime.now().month.toString() : DateTime.now().month.toString()) + '-' + (DateTime.now().day.toString().length < 2 ? '0' + DateTime.now().day.toString() : DateTime.now().day.toString()) + ' ' + notifyTime + ':00');
+                                  
+                                inspect(jsonResult['count']);
                                 if(jsonResult.isNotEmpty && titleFormController.text.trim().isNotEmpty && subTitleFormController.text.trim().isNotEmpty && jsonResult['count'] < 5 && timeNow.millisecondsSinceEpoch > DateTime.now().millisecondsSinceEpoch){
                                   notify(jsonResult['count'] + 1, titleFormController.text.trim(), subTitleFormController.text.trim(), notifyTime/*, dropdownvalue*/).then((value){
                                     setState(() {});
@@ -329,8 +336,10 @@ class _ReminderPageState extends State<ReminderPage> {
 
   @override
   Widget build(BuildContext context) {
-    return SafeArea(
-      child: Scaffold(
+    return 
+    // SafeArea(
+    //   child: 
+      Scaffold(
         appBar: AppBar(
           centerTitle: true,
           title: RichText(
@@ -496,7 +505,7 @@ class _ReminderPageState extends State<ReminderPage> {
                   ),
           ),
         ),
-      ),
+      // ),
     );
   }
 }
